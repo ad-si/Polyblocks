@@ -1,0 +1,31 @@
+{
+  "name": "Polyblocks",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.8",
+    "jade": "*"
+  },
+  "description": "Polyblocks ==========",
+  "main": "app.js",
+  "devDependencies": {
+    "stylus": "~0.42.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adius/Polyblocks.git"
+  },
+  "keywords": [
+    "tetris",
+    "multiplayer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adius/Polyblocks/issues"
+  },
+  "homepage": "https://github.com/adius/Polyblocks"
+}
