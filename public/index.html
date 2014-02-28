@@ -1,0 +1,37 @@
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <div id="show"></div>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+          var socket = io.connect('http://localhost');
+          var field = [];
+          socket.on('base', function (data) {
+                var field = [];
+               for (var y = 0; y < data.field.length; y++) {
+                    field.push([]);
+                   for (var x = 0; x < data.field[y].length; x++) {
+                       if (data.field[y][x]){
+                        field[y].push(data.field[y][x].id);
+                    } else {
+                        field[y].push(0);
+                    }
+                   };
+               };
+               $('#show').empty();
+               for (var y = 0; y < field.length; y++) {
+                    $('#show').append("<br>");
+                    $('#show').append(field[y]);
+                    $('#show').append("    "+y);
+               }
+
+               $('#show').append("<br>pos: "+ data.players[0].position);
+          });
+          socket.emit('update', { my: 'data' });
+        </script>
+    </body>
+</html>
+
