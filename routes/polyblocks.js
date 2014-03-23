@@ -53,6 +53,7 @@ var _sockets = null,
 			],
 		],
 	_blockid = 0,
+	_pid = 1,
 	_timeout = 500
 
 
@@ -66,20 +67,38 @@ exports.init = function(sockets){
 	setTimeout(gameloop,_timeout)
 }
 
+function sendBaseData(){
+	_sockets.emit('base', {players: _player, field: _field})
+}
+
+function gameloop(){
+	movePiecesDown()
+	//checkPlacement()
+	//checkLines()
+	sendBaseData()
+	setTimeout(gameloop,_timeout)
+}
+
+
 function newPlayer(socket){
 	socket.on('update', recvUpdate)
+	socket.on('disconnect', recvDisconnect)
 	// create new Player object
-	_player.push({
-		pid: 1,
-		name: 'rnd',
-		position: [0, 0],
-		rotation: 0,
-		type: 0,
-		id: _blockid++
+	_player.push(_playerproto = {
+		pid: ++_pid,
+		name: 'rnd'
 	})
+	newPiece(_player[_player.length-1])
 
 	//placePiece(0, 2, [0,0],1,'dustin')
 	sendBaseData()
+}
+
+function newPiece(player){
+	player.position = [0, 0]
+	player.rotation = 0
+	player.type = 0,
+	player.id = _blockid++
 }
 
 function recvUpdate(data){
@@ -88,18 +107,9 @@ function recvUpdate(data){
 	//sendBaseData()
 }
 
-function sendBaseData(){
-	_sockets.emit('base', {players: _player, field: _field})
-}
-
-
-function gameloop(){
-	movePiecesDown()
-	//checkPlacement()
-	//checkLines()
-	sendBaseData()
-	console.log(_field);
-	setTimeout(gameloop,_timeout)
+function recvDisconnect(){
+	console.log('disconnect')
+	_field = newMatrix(20,20)
 }
 
 function movePiecesDown(){
