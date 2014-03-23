@@ -1,8 +1,3 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express'),
 	http = require('http'),
 	path = require('path'),
@@ -34,6 +29,6 @@ app.get('/', polyblocks.index)
 polyblocks.init(io.sockets)
 
 
-server.listen(app.get('port'), function(){
+server.listen(app.get('port'), function () {
 	console.log('Polyblocks server listening on port ' + app.get('port'))
 })
