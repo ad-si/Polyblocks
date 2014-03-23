@@ -23,7 +23,7 @@ if (app.get('env') == 'development') {
 }
 
 // routes
-app.get('/', polyblocks.index)
+//app.get('/', polyblocks.index)
 
 
 polyblocks.init(io.sockets)

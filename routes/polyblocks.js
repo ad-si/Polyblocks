@@ -85,7 +85,7 @@ function newPlayer(socket) {
 }
 
 function recvUpdate(data) {
-	console.log(data)
+	//console.log(data)
 	//handle movement
 	//sendBaseData()
 }
@@ -100,7 +100,7 @@ function gameloop() {
 	//checkPlacement()
 	//checkLines()
 	sendBaseData()
-	console.log(_field)
+	//console.log(_field)
 	setTimeout(gameloop,_timeout)
 }
 

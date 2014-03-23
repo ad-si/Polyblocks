@@ -29,14 +29,17 @@
 				stage = new createjs.Stage(canvas),
 				pixelSize = 10
 
-			data.forEach(function (column, x) {
+			//console.log(data)
+
+			data.field.forEach(function (column, x) {
 				column.forEach(function (pixel, y) {
 
-					var rect = new createjs.Shape()
+					var rect = new createjs.Shape(),
+						color = (pixel)? 'rgb(255,50,50)' : null
 
 					rect
 						.graphics
-						.beginFill('rgba(' + Math.round(Math.random() * 255) + ',0,0,1)')
+						.beginFill(color)
 						.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
 
 					stage.addChild(rect)
@@ -48,12 +51,12 @@
 		}
 
 
-		/* TODO: uncomment
-		 socket.on('base', function (data) {
+		// TODO: uncomment
 
-		 render(data)
-		 })
-		 */
+		socket.on('base', function (data) {
+			console.log(data)
+			render(data)
+		})
 
 
 		for (var key in keymap)
@@ -86,7 +89,7 @@
 					id: 1,
 					name: 'dustin'
 				}
-			],
+			]
 		])
 	}
 
