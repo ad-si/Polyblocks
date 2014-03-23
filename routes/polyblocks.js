@@ -2,63 +2,56 @@ var _sockets = null,
 	_field = newMatrix(20, 20),
 	_player = [],
 	_types = [
-		[
-			[0, 0, 0, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 1, 1, 1, 0],
-			[0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0]
+				[
+					[0, 0, 0, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 1, 1, 1, 0],
+					[0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 0, 1, 1, 0],
+					[0, 1, 1, 0, 0],
+					[0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 1, 1, 0, 0],
+					[0, 0, 1, 1, 0],
+					[0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 1, 1, 0, 0],
+					[0, 1, 1, 0, 0],
+					[0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 1, 1, 0, 0],
+					[0, 0, 0, 0, 0]
+				], [
+					[0, 0, 0, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 0, 0],
+					[0, 0, 1, 1, 0],
+					[0, 0, 0, 0, 0]
+			]
 		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 0, 1, 1, 0],
-			[0, 1, 1, 0, 0],
-			[0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0]
-		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 1, 1, 0, 0],
-			[0, 0, 1, 1, 0],
-			[0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0]
-		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 1, 1, 0, 0],
-			[0, 1, 1, 0, 0],
-			[0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0]
-		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0]
-		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0]
-		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 1, 1, 0, 0],
-			[0, 0, 0, 0, 0]
-		],
-		[
-			[0, 0, 0, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 0, 0],
-			[0, 0, 1, 1, 0],
-			[0, 0, 0, 0, 0]
-		]
-	],
 	_blockid = 0,
 	_timeout = 500,
 	x,
@@ -79,6 +72,7 @@ function newPlayer(socket) {
 	socket.on('update', recvUpdate)
 	// create new Player object
 	_player.push({
+		pid: 1,
 		name: 'rnd',
 		position: [0, 0],
 		rotation: 0,
@@ -103,15 +97,21 @@ function sendBaseData() {
 
 function gameloop() {
 	movePiecesDown()
-	checkPlacement()
-	checkLines()
+	//checkPlacement()
+	//checkLines()
 	sendBaseData()
-	setTimeout(gameloop, _timeout)
+	console.log(_field)
+	setTimeout(gameloop,_timeout)
 }
 
 function movePiecesDown() {
 	for (i = 0; i < _player.length; i++) {
 		_player[i].position[1]++
+		if (isColliding(_player[i])){
+			_player[i].position[1]--
+			placePiece(_player[i])
+			_player[i].position[1]=0
+		}
 	}
 }
 
@@ -166,28 +166,42 @@ function checkPieceOf(player) {
 			}
 		}
 		console.log(_player)
-		if (!isValid || y >= 10) {
-
+		if (!isValid || y >= 10){
 			placePiece(player.type, player.id, player.position, player.rotation, player.name)
 		}
 	}
 }
 
-function placePiece(type, id, position, rotation, owner) {
 
-	var x = position[0],
-		y = position[0],
-		matrix = rotateMatrix(_types[type], rotation),
-		dy,
-		dx
+function placePiece(player){
+	var x = player.position[0],
+		y = player.position[1],
+		matrix = rotateMatrix(_types[player.type],player.rotation)
 
-	for (dy = 0; dy < matrix.length; dy++) {
-		for (dx = 0; dx < matrix[0].length; dx++) {
-			if (matrix[dy][dx]) {
-				_field[dy + y][dx + x] = {type: type, id: id, owner: owner}
+	for (var dy = 0; dy < matrix.length; dy++){
+		for (var dx = 0; dx < matrix[0].length; dx++){
+			if (matrix[dy][dx]){
+				_field[dy+y][dx+x] = {type: player.type, id: player.id, owner: player.pid}
 			}
 		}
 	}
+}
+
+function isColliding(player){
+	var x = player.position[0],
+		y = player.position[1],
+		matrix = rotateMatrix(_types[player.type],player.rotation)
+
+	for (var dy = 0; dy < matrix.length; dy++){
+		for (var dx = 0; dx < matrix[0].length; dx++){
+			if (matrix[dy][dx]){
+				if ( dx+x < 0 || dy+y < 0 || dx+x >= _field[0].length|| dy+y >= _field.length || _field[dy+y][dx+x]){
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // Matrix-Manipulation
