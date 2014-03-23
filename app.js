@@ -22,9 +22,6 @@ if (app.get('env') == 'development') {
 	app.use(express.errorHandler())
 }
 
-// routes
-app.get('/', polyblocks.index)
-
 
 polyblocks.init(io.sockets)
 

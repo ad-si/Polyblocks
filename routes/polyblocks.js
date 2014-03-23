@@ -1,57 +1,8 @@
+var shared = require('../public/js/shared.js')
+
 var _sockets = null,
 	_field = newMatrix(20, 20),
 	_player = [],
-	_types = [
-				[
-					[0, 0, 0, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 1, 1, 1, 0],
-					[0, 0, 0, 0, 0],
-					[0, 0, 0, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 0, 1, 1, 0],
-					[0, 1, 1, 0, 0],
-					[0, 0, 0, 0, 0],
-					[0, 0, 0, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 1, 1, 0, 0],
-					[0, 0, 1, 1, 0],
-					[0, 0, 0, 0, 0],
-					[0, 0, 0, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 1, 1, 0, 0],
-					[0, 1, 1, 0, 0],
-					[0, 0, 0, 0, 0],
-					[0, 0, 0, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 1, 1, 0, 0],
-					[0, 0, 0, 0, 0]
-				], [
-					[0, 0, 0, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 0, 0],
-					[0, 0, 1, 1, 0],
-					[0, 0, 0, 0, 0]
-			]
-		],
 	_blockid = 0,
 	_blockpos = 0,
 	_pid = 1,
@@ -60,15 +11,20 @@ var _sockets = null,
 	i, y
 
 
-exports.index = function (req, res) {
-	res.send('hello world')
+if (typeof module === "object" && module && typeof module.exports === "object"){
+
+	exports.index = function (req, res) {
+		res.send('hello world')
+	}
+
+
+	exports.init = function (sockets) {
+		_sockets = sockets
+		_sockets.on('connection', newPlayer)
+		gameloop()
+	}
 }
 
-exports.init = function (sockets) {
-	_sockets = sockets
-	_sockets.on('connection', newPlayer)
-	gameloop()
-}
 
 function sendBaseData() {
 	_sockets.emit('base', {players: _player, field: _field})
@@ -104,7 +60,7 @@ function newPiece(player) {
 }
 
 function recvUpdate(data) {
-	console.log(data)
+	//console.log(data)
 	//handle movement
 	//sendBaseData()
 }
@@ -119,7 +75,6 @@ function recvDisconnect(data,socket) {
 		}
 	}
 	_player = _player.splice(pidToDelete, 1)
-
 }
 
 function movePiecesDown() {
@@ -137,7 +92,7 @@ function movePiecesDown() {
 function placePiece(player){
 	var x = player.position[0],
 		y = player.position[1],
-		matrix = rotateMatrix(_types[player.type],player.rotation)
+		matrix = rotateMatrix(shared.types[player.type],player.rotation)
 
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
@@ -151,7 +106,7 @@ function placePiece(player){
 function isColliding(player){
 	var x = player.position[0],
 		y = player.position[1],
-		matrix = rotateMatrix(_types[player.type],player.rotation)
+		matrix = rotateMatrix(shared.types[player.type],player.rotation)
 
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
