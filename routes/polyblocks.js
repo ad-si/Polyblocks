@@ -53,6 +53,7 @@ var _sockets = null,
 			]
 		],
 	_blockid = 0,
+	_pid = 1,
 	_timeout = 500,
 	x,
 	i, y
@@ -68,20 +69,38 @@ exports.init = function (sockets) {
 	setTimeout(gameloop, _timeout)
 }
 
-function newPlayer(socket) {
-	socket.on('update', recvUpdate)
-	// create new Player object
-	_player.push({
-		pid: 1,
-		name: 'rnd',
-		position: [0, 0],
-		rotation: 0,
-		type: 0,
-		id: _blockid++
-	})
+function sendBaseData() {
+	_sockets.emit('base', {players: _player, field: _field})
+}
 
-	//placePiece(0, 2, [0,0],1,'dustin')
+function gameloop() {
+	movePiecesDown()
+	//checkPlacement()
+	//checkLines()
 	sendBaseData()
+	setTimeout(gameloop,_timeout)
+}
+
+
+function newPlayer(socket) {
+	// create new Player object
+	_player.push(_playerproto = {
+		pid: ++_pid,
+		name: 'rnd'
+	})
+	newPiece(_player[_player.length-1])
+
+	socket.on('update', recvUpdate)
+	socket.on('disconnect', recvDisconnect)
+	socket['pid']=_pid
+	sendBaseData()
+}
+
+function newPiece(player) {
+	player.position = [0, 0]
+	player.rotation = 0
+	player.type = 0,
+	player.id = _blockid++
 }
 
 function recvUpdate(data) {
@@ -90,18 +109,16 @@ function recvUpdate(data) {
 	//sendBaseData()
 }
 
-function sendBaseData() {
-	_sockets.emit('base', {players: _player, field: _field})
-}
-
-
-function gameloop() {
-	movePiecesDown()
-	//checkPlacement()
-	//checkLines()
-	sendBaseData()
-	//console.log(_field)
-	setTimeout(gameloop,_timeout)
+function recvDisconnect(data,socket) {
+	console.log('disconnect')
+	_field = newMatrix(20,20)
+	pidToDelete = -1;
+	for (var i = 0; i < _player.length; i++) {
+		if (_player[i].pid == this.pid){
+			pidToDelete = this.pid
+		}
+	}
+	_player = _player.splice(pidToDelete, 1)
 }
 
 function movePiecesDown() {
@@ -119,12 +136,12 @@ function checkLines() {
 
 	var lineFull
 
-	for (y = 0; y < _field.length; y++) {
+	for (y = 0; y < _field[0].length; y++) {
 
 		lineFull = true
 
-		for (x = 0; x < _field[0].length; x++) {
-			if (!_field[y][x]) {
+		for (x = 0; x < _field.length; x++) {
+			if (!_field[x][y]) {
 				lineFull = false;
 				break
 			}
@@ -134,45 +151,6 @@ function checkLines() {
 	}
 }
 
-function clearLine(line) {
-	for (y = line; y > 0; y--) {
-		for (x = 0; x < _field[0].length; x++) {
-			_field[y][x] = _field[y - 1][x]
-		}
-	}
-	for (x = 0; x < _field[0].length; x++) {
-		_field[0][x] = 0
-	}
-}
-
-function checkPlacement() {
-	for (i = 0; i < _player.length; i++) {
-		checkPieceOf(_player[i])
-	}
-}
-
-function checkPieceOf(player) {
-
-	var x = player.position[0],
-		y = player.position[1],
-		matrix = rotateMatrix(_types[player.type], player.rotation),
-		isValid = true
-
-	for (dy = 0; dy < matrix.length; dy++) {
-		for (dx = 0; dx < matrix[0].length; dx++) {
-			if (matrix[dy][dx] && _field[dy + y + 1][dx + x]) {
-				isValid = false;
-				break;
-			}
-		}
-		console.log(_player)
-		if (!isValid || y >= 10){
-			placePiece(player.type, player.id, player.position, player.rotation, player.name)
-		}
-	}
-}
-
-
 function placePiece(player){
 	var x = player.position[0],
 		y = player.position[1],
@@ -181,7 +159,7 @@ function placePiece(player){
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
 			if (matrix[dy][dx]){
-				_field[dy+y][dx+x] = {type: player.type, id: player.id, owner: player.pid}
+				_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid}
 			}
 		}
 	}
@@ -195,7 +173,7 @@ function isColliding(player){
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
 			if (matrix[dy][dx]){
-				if ( dx+x < 0 || dy+y < 0 || dx+x >= _field[0].length|| dy+y >= _field.length || _field[dy+y][dx+x]){
+				if ( dx+x < 0 || dy+y < 0 || dx+x >= _field[0].length|| dy+y >= _field.length || _field[dx+x][dy+y]){
 					return true
 				}
 			}
