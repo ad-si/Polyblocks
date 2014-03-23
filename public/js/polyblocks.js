@@ -29,7 +29,21 @@
 				stage = new createjs.Stage(canvas),
 				pixelSize = 10
 
-			//console.log(data)
+			console.log(data)
+
+			data.players.forEach(function(player){
+
+				var x = player.position[0],
+					y = player.position[1],
+					matrix = rotateMatrix(types[player.type], player.rotation),
+					dx,
+					dy
+
+				for (dy = 0; dy < matrix.length; dy++)
+					for (dx = 0; dx < matrix[0].length; dx++)
+						if (matrix[dy][dx])
+							data.field[dx + x][dy + y] = 1
+			})
 
 			data.field.forEach(function (column, x) {
 				column.forEach(function (pixel, y) {
@@ -51,10 +65,7 @@
 		}
 
 
-		// TODO: uncomment
-
 		socket.on('base', function (data) {
-			console.log(data)
 			render(data)
 		})
 
@@ -65,7 +76,7 @@
 
 
 		// TODO: delete
-		render([
+		/*render([
 			[
 				{
 					type: 1,
@@ -91,6 +102,7 @@
 				}
 			]
 		])
+		*/
 	}
 
 }(window, document)
