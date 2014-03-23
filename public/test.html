@@ -10,12 +10,12 @@
           var socket = io.connect('http://localhost');
           var field = [];
           socket.on('base', function (data) {
-                var field = [];
+               var field = [];
                for (var y = 0; y < data.field.length; y++) {
                     field.push([]);
                    for (var x = 0; x < data.field[y].length; x++) {
                        if (data.field[y][x]){
-                        field[y].push(data.field[y][x].id);
+                        field[y].push(1);
                     } else {
                         field[y].push(0);
                     }
@@ -34,3 +34,24 @@
         </script>
     </body>
 </html>
+
+<!-- data example
+
+  {
+    players: [
+            {name:"dustin",
+            position: [0,0],
+            rotation: 90,
+            type: 1,
+            id: 800}
+
+                ],
+    field: [
+            [{type:1,owner:1,id:1},...],
+            [{type:1,owner:1,id:1},...],
+            ...
+            [undefinded],
+            ...
+            ]
+
+} -->
