@@ -1,6 +1,6 @@
 !function (window, document) {
 
-	window.polyblocks = function (socket) {
+	window.polyblocks = function (socket, canvas) {
 
 
 		var keymap = {
@@ -17,7 +17,7 @@
 					socket.emit('left')
 				},
 				space: function () {
-					socket.emit('right')
+					socket.emit('space')
 				}
 			},
 			i
@@ -27,15 +27,16 @@
 
 			var canvas = document.getElementById('canvas'),
 				stage = new createjs.Stage(canvas),
-				pixelSize = 10
+				pixelSize = 14
 
-			console.log(data)
+			canvas.setAttribute('width', String(pixelSize * data.field[0].length))
+			canvas.setAttribute('height', String(pixelSize * data.field.length))
 
 			data.players.forEach(function(player){
 
 				var x = player.position[0],
 					y = player.position[1],
-					matrix = rotateMatrix(types[player.type], player.rotation),
+					matrix = rotateMatrix(shared.types[player.type], player.rotation),
 					dx,
 					dy
 
