@@ -53,6 +53,7 @@ var _sockets = null,
 			]
 		],
 	_blockid = 0,
+	_blockpos = 0,
 	_pid = 1,
 	_timeout = 500,
 	x,
@@ -66,7 +67,7 @@ exports.index = function (req, res) {
 exports.init = function (sockets) {
 	_sockets = sockets
 	_sockets.on('connection', newPlayer)
-	setTimeout(gameloop, _timeout)
+	gameloop()
 }
 
 function sendBaseData() {
@@ -81,9 +82,7 @@ function gameloop() {
 	setTimeout(gameloop,_timeout)
 }
 
-
 function newPlayer(socket) {
-	// create new Player object
 	_player.push(_playerproto = {
 		pid: ++_pid,
 		name: 'rnd'
@@ -97,7 +96,8 @@ function newPlayer(socket) {
 }
 
 function newPiece(player) {
-	player.position = [0, 0]
+	_blockpos=_blockpos+5
+	player.position = [_blockpos%_field.length, 0]
 	player.rotation = 0
 	player.type = 0,
 	player.id = _blockid++
@@ -133,24 +133,6 @@ function movePiecesDown() {
 	}
 }
 
-function checkLines() {
-
-	var lineFull
-
-	for (y = 0; y < _field[0].length; y++) {
-
-		lineFull = true
-
-		for (x = 0; x < _field.length; x++) {
-			if (!_field[x][y]) {
-				lineFull = false;
-				break
-			}
-		}
-		if (lineFull)
-			return clearLine(y)
-	}
-}
 
 function placePiece(player){
 	var x = player.position[0],

@@ -107,7 +107,12 @@
                for (var y = 0; y < field.length; y++) {
                     $('#show').append("<br>");
                     for (var i = 0; i < field[y].length; i++) {
-                      $('#show').append(field[i][y]);
+                      if (field[i][y]==1){
+                        $('#show').append('<span style="color:#0f0">X</span>');
+                      } else {
+                        $('#show').append('<span style="color:#ddd">O</span>');
+                      }
+                      
                     };
                     $('#show').append("    "+y);
                }
