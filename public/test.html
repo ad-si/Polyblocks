@@ -4,9 +4,36 @@
     </head>
     <body>
         <div id="show"></div>
+
         <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+        <script src="components/mousetrap/mousetrap.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
+
+        var keymap = {
+        _38: function (event) {
+          event.preventDefault()
+          console.log('up')
+          socket.emit('update', 'up')
+        },
+        _40: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'down')
+        },
+        _39: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'right')
+        },
+        _37: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'left')
+        },
+        space: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'space')
+        }
+      }
+
           var _types = [
         [
           [0, 0, 0, 0, 0],
@@ -58,12 +85,27 @@
           [0, 0, 0, 0, 0]
       ]
     ]
+function newMatrix(n, m) {
+
+  var matrix = [],
+    y
+
+  for (y = 0; y < n; y++) {
+    matrix.push([]);
+    for (x = 0; x < m; x++) {
+      matrix[y].push(undefined)
+    }
+  }
+
+  return matrix
+}
+    
     function rotateMatrix(matrix, n) {
 
       var rotMatrix,
         _n, y ,x
 
-      for (n = 0; _n < n; _n++) {
+      for (_n = 0; _n < n; _n++) {
         rotMatrix = newMatrix(matrix.length, matrix[0].length)
         for (y = 0; y < matrix.length; y++) {
           for (x = 0; x < matrix[0].length; x++) {
@@ -78,6 +120,7 @@
           var socket = io.connect('http://localhost');
           var field = [];
           socket.on('base', function (data) {
+            console.time('render')
                var field = [];
                for (var y = 0; y < data.field.length; y++) {
                     field.push([]);
@@ -118,8 +161,15 @@
                }
 
                $('#show').append("<br>pos: "+ data.players[0].position);
+               console.timeEnd('render')
           });
           // socket.emit('update', { my: 'data' });
+
+          $(document).keydown(function(e){
+            if (e.keyCode < 41 && e.keyCode > 36) { 
+               keymap['_'+e.keyCode](e);
+            }
+        });
         </script>
     </body>
 </html>

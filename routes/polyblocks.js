@@ -6,16 +6,18 @@ var _sockets = null,
 	_blockid = 0,
 	_blockpos = 0,
 	_pid = 1,
-	_timeout = 500,
+	_timeout = 100,
 	x,
 	i, y,
 
 	keymap = {
-		up: function (player) {
-			// player.position[1]++
-		},
 		down: function (player) {
-			player.position[1]++	
+			player.rotation = (player.rotation + 1) % 4
+		},
+		up: function (player) {
+			player.rotation--
+			if (player.rotation === -1)
+				player.rotation = 4
 		},
 		right: function (player) {
 			player.position[0]++
@@ -24,15 +26,17 @@ var _sockets = null,
 			player.position[0]--
 		},
 		space: function (player) {
-			player.rotation = (player.rotation + 1) % 4
+			
 		}
 	},
 	revert = {
-		up: function (player) {
-			// player.position[1]++
-		},
 		down: function (player) {
-			player.position[1]--	
+			player.rotation--
+			if (player.rotation === -1)
+				player.rotation = 4
+		},
+		up: function (player) {
+			player.rotation = (player.rotation + 1) % 4
 		},
 		right: function (player) {
 			player.position[0]--
@@ -41,7 +45,7 @@ var _sockets = null,
 			player.position[0]++
 		},
 		space: function (player) {
-			player.rotation = (player.rotation - 1) % 4
+			
 		}
 	}
 
@@ -66,10 +70,12 @@ function sendBaseData() {
 }
 
 function gameloop() {
+	console.time('gameloop')
 	movePiecesDown()
 	//checkPlacement()
 	//checkLines()
 	sendBaseData()
+	console.timeEnd('gameloop')
 	setTimeout(gameloop,_timeout)
 }
 
@@ -95,6 +101,7 @@ function newPiece(player) {
 }
 
 function recvUpdate(data) {
+	console.time('update')
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid == this.pid){
 			player = _player[i]
@@ -105,6 +112,7 @@ function recvUpdate(data) {
 		revert[data](player)
 	}
 	sendBaseData()
+	console.timeEnd('update')
 }
 
 function recvDisconnect(data) {
