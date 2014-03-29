@@ -13,6 +13,8 @@ var _sockets = null,
 	timeout,
 	x,
 	i, y,
+	_gameloop,
+	_gameover = false
 
 	keymap = {
 		up: function (player) {
@@ -76,7 +78,13 @@ function randomInt (low, high) {
 }
 
 function sendBaseData() {
-	_sockets.emit('base', {players: _player, field: _field})
+	_sockets.emit('base', {players: _player, field: _field, score:_clearedLines})
+}
+
+function gameover(){
+	_gameover = true
+	_sockets.emit('gameover', {players: _player, field: _field, score:_clearedLines})
+	clearTimeout(_gameloop)
 }
 
 function gameloop() {
@@ -84,7 +92,7 @@ function gameloop() {
 	sendBaseData()
 	timeout = (_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed
 	// console.log('speed: '+timeout+'ms')
-	setTimeout(gameloop,timeout)
+	_gameloop = setTimeout(gameloop, timeout)
 }
 
 function newPlayer(socket) {
@@ -101,14 +109,17 @@ function newPlayer(socket) {
 }
 
 function newPiece(player) {
-	console.log(_field[0].length)
 	player.position = [randomInt(0, _WIDTH-5), 0]
 	player.rotation = 0
 	player.type = randomInt(0, 8),
 	player.id = _blockid++
+	if (isColliding(player)){
+		gameover()
+	}
 }
 
 function recvUpdate(data) {
+	if (_gameover){return}
 	// console.time('update')
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid == this.pid){
@@ -134,6 +145,9 @@ function recvDisconnect(data) {
 		}
 	}
 	_player = _player.splice(pidToDelete, 1)
+
+	if (_gameover){gameloop()}
+	_gameover = false
 }
 
 function movePiecesDown() {
