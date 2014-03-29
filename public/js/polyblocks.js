@@ -3,37 +3,57 @@
 	window.polyblocks = function (socket, canvas) {
 
 
-		var keymap = {
-				up: function (event) {
-					event.preventDefault()
+		var modifications = {
+				rotateRight: function (event) {
+					//event.preventDefault()
 					socket.emit('update', 'up')
 				},
-				down: function (event) {
-					event.preventDefault()
+				rotateLeft: function (event) {
+					//event.preventDefault()
 					socket.emit('update', 'down')
 				},
-				right: function (event) {
-					event.preventDefault()
+				moveRight: function (event) {
+					//event.preventDefault()
 					socket.emit('update', 'right')
 				},
-				left: function (event) {
-					event.preventDefault()
+				moveLeft: function (event) {
+					//event.preventDefault()
 					socket.emit('update', 'left')
 				},
-				space: function (event) {
-					event.preventDefault()
+				moveDown: function (event) {
+					//event.preventDefault()
 					socket.emit('update', 'space')
 				}
 			},
+			keymap = {
+				up: modifications.rotateRight,
+				right: modifications.moveRight,
+				down: modifications.rotateLeft,
+				left: modifications.moveLeft,
+				space: modifications.moveDown
+			},
+			touchMap = {
+				swipeup: modifications.rotateRight,
+				dragup: modifications.rotateRight,
+				tap: modifications.rotateRight,
+
+				swipedown: modifications.moveDown,
+				dragdown: modifications.moveDown,
+
+				swiperight: modifications.moveRight,
+				dragright: modifications.moveRight,
+
+				swipeleft: modifications.moveLeft,
+				dragleft: modifications.moveLeft
+			},
 			key,
+			gesture,
 			counter = 0,
 			firstCall = true,
 			i
 
 
 		function render(data) {
-
-			console.time('render')
 
 			var pixelSize = 14,
 				stage = new createjs.Stage(canvas)
@@ -43,8 +63,8 @@
 				console.log(data.field.length)
 				console.log(data.field[0].length)
 
-				canvas.setAttribute('width', String(pixelSize * data.field[0].length))
-				canvas.setAttribute('height', String(pixelSize * data.field.length))
+				canvas.setAttribute('width', String(pixelSize * data.field[0].length) + 'px')
+				canvas.setAttribute('height', String(pixelSize * data.field.length) + 'px')
 				firstCall = false
 			}
 
@@ -76,8 +96,6 @@
 
 						stage.addChild(rect)
 						stage.update()
-
-						console.timeEnd('render')
 					}
 				})
 			})
@@ -88,8 +106,24 @@
 			if (keymap.hasOwnProperty(key))
 				Mousetrap.bind(key, keymap[key])
 
+
+		/*document.body.addEventListener('touchmove', function(event){
+		 event.preventDefault()
+
+		 console.log(event)
+
+		 })*/
+
+		Hammer(document.body, {prevent_default: true})
+			.on('swipeup swipedown dragleft dragright tap', function (event) {
+
+				console.log(event.type)
+
+				touchMap[event.type]()
+			})
+
+
 		socket.on('base', function (data) {
-			console.log('base received', counter++)
 			render(data)
 		})
 	}

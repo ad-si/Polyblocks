@@ -2,7 +2,7 @@ var shared = require('../public/js/shared.js')
 
 var _sockets = null,
 	_WIDTH = 30,
-	_HEIGHT = 80,
+	_HEIGHT = 40,
 	_field = shared.newMatrix(_HEIGHT, _WIDTH),
 	_player = [],
 	_blockid = 0,
