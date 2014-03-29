@@ -1,14 +1,16 @@
 var shared = require('../public/js/shared.js')
 
 var _sockets = null,
-	_WIDTH = 30,
-	_HEIGHT = 80,
+	_WIDTH = 10,
+	_HEIGHT = 30,
+	_minSpeed = 500,
+	_maxSpeed = 50,
 	_field = shared.newMatrix(_HEIGHT, _WIDTH),
 	_player = [],
 	_blockid = 0,
-	_blockpos = 0,
 	_pid = 1,
-	_timeout = 200,
+	_clearedLines = 0,
+	timeout,
 	x,
 	i, y,
 
@@ -28,7 +30,11 @@ var _sockets = null,
 			player.position[0]--
 		},
 		space: function (player) {
-			
+			while (!isColliding(player)){
+				player.position[1]++
+			}
+			player.position[1]--
+			placePiece(player)
 		}
 	},
 	revert = {
@@ -54,31 +60,31 @@ var _sockets = null,
 
 if (typeof module === "object" && module && typeof module.exports === "object"){
 
-	exports.index = function (req, res) {
-		res.send('hello world')
-	}
-
 
 	exports.init = function (sockets) {
 		_sockets = sockets
 		_sockets.on('connection', newPlayer)
+		Math.random()
+		Math.random()
+		Math.random()
 		gameloop()
 	}
 }
 
+function randomInt (low, high) {
+    return Math.floor(Math.random() * (high - low) + low);
+}
 
 function sendBaseData() {
 	_sockets.emit('base', {players: _player, field: _field})
 }
 
 function gameloop() {
-	// console.time('gameloop')
 	movePiecesDown()
-	//checkPlacement()
-	//checkLines()
 	sendBaseData()
-	// console.timeEnd('gameloop')
-	setTimeout(gameloop,_timeout)
+	timeout = (_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed
+	// console.log('speed: '+timeout+'ms')
+	setTimeout(gameloop,timeout)
 }
 
 function newPlayer(socket) {
@@ -95,10 +101,10 @@ function newPlayer(socket) {
 }
 
 function newPiece(player) {
-	_blockpos=_blockpos+5
-	player.position = [_blockpos%_field.length, 0]
+	console.log(_field[0].length)
+	player.position = [randomInt(0, _WIDTH-5), 0]
 	player.rotation = 0
-	player.type = Math.floor(Math.random()*8),
+	player.type = randomInt(0, 8),
 	player.id = _blockid++
 }
 
@@ -119,6 +125,7 @@ function recvUpdate(data) {
 
 function recvDisconnect(data) {
 	console.log('disconnect')
+	_clearedLines = 0
 	_field = shared.newMatrix(_HEIGHT,_WIDTH)
 	pidToDelete = -1;
 	for (var i = 0; i < _player.length; i++) {
@@ -135,7 +142,28 @@ function movePiecesDown() {
 		if (isColliding(_player[i])){
 			_player[i].position[1]--
 			placePiece(_player[i])
-			_player[i].position[1]=0
+		}
+	}
+}
+
+function clearFinishedLines(){
+	y = _HEIGHT-1
+	while (y >= 0) {
+		cleared = true
+		for (x = 0; x <_WIDTH; x++) {
+			if (!_field[x][y]){
+				cleared = false
+			}
+		}
+		if (cleared){
+			_clearedLines++
+			for (i = y-1; i >= 0; i--){
+				for (x = 0; x <_WIDTH; x++) {
+					_field[x][i+1] = _field[x][i]
+				}
+			}
+		} else {
+			y--
 		}
 	}
 }
@@ -154,6 +182,7 @@ function placePiece(player){
 		}
 	}
 	newPiece(player)
+	clearFinishedLines();
 }
 
 function isColliding(player){
@@ -164,7 +193,7 @@ function isColliding(player){
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
 			if (matrix[dy][dx]){
-				if ( dx+x < 0 || dy+y < 0 || dx+x >= _field[0].length|| dy+y >= _field.length || _field[dx+x][dy+y]){
+				if ( dx+x < 0 || dy+y < 0 || dx+x >= _WIDTH|| dy+y >= _HEIGHT || _field[dx+x][dy+y]){
 					return true
 				}
 			}
