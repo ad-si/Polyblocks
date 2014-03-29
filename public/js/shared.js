@@ -62,6 +62,7 @@ shared.types = [
 shared.newMatrix = function (n, m) {
 
 	var matrix = [],
+		x,
 		y
 
 	for (y = 0; y < n; y++) {

@@ -1,7 +1,9 @@
 var shared = require('../public/js/shared.js')
 
 var _sockets = null,
-	_field = shared.newMatrix(10, 10),
+	_WIDTH = 30,
+	_HEIGHT = 80,
+	_field = shared.newMatrix(_HEIGHT, _WIDTH),
 	_player = [],
 	_blockid = 0,
 	_blockpos = 0,
@@ -117,7 +119,7 @@ function recvUpdate(data) {
 
 function recvDisconnect(data) {
 	console.log('disconnect')
-	_field = shared.newMatrix(20,20)
+	_field = shared.newMatrix(_HEIGHT,_WIDTH)
 	pidToDelete = -1;
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid == this.pid){
