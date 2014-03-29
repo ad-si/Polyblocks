@@ -25,19 +25,26 @@
 					socket.emit('update', 'space')
 				}
 			},
+			key,
+			counter = 0,
+			firstCall = true,
 			i
 
 
 		function render(data) {
 
-			var canvas = document.getElementById('canvas'),
-				stage = new createjs.Stage(canvas),
-				pixelSize = 14
+			console.time('render')
 
-			canvas.setAttribute('width', String(pixelSize * data.field[0].length))
-			canvas.setAttribute('height', String(pixelSize * data.field.length))
+			var pixelSize = 14,
+				stage = new createjs.Stage(canvas)
 
-			data.players.forEach(function(player){
+			if (firstCall === true) {
+				canvas.setAttribute('width', String(pixelSize * data.field[0].length))
+				canvas.setAttribute('height', String(pixelSize * data.field.length))
+				firstCall = false
+			}
+
+			data.players.forEach(function (player) {
 
 				var x = player.position[0],
 					y = player.position[1],
@@ -54,62 +61,33 @@
 			data.field.forEach(function (column, x) {
 				column.forEach(function (pixel, y) {
 
-					var rect = new createjs.Shape(),
-						color = (pixel)? 'rgb(255,50,50)' : null
+					if (pixel) {
+						var rect = new createjs.Shape(),
+							color = 'rgb(255,50,50)'
 
-					rect
-						.graphics
-						.beginFill(color)
-						.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
+						rect
+							.graphics
+							.beginFill(color)
+							.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
 
-					stage.addChild(rect)
-					stage.update()
+						stage.addChild(rect)
+						stage.update()
+
+						console.timeEnd('render')
+					}
 				})
 			})
-
-
 		}
 
 
-		socket.on('base', function (data) {
-			console.log('base received')
-			render(data)
-		})
-
-
-		for (var key in keymap)
+		for (key in keymap)
 			if (keymap.hasOwnProperty(key))
 				Mousetrap.bind(key, keymap[key])
 
-
-		// TODO: delete
-		/*render([
-			[
-				{
-					type: 1,
-					id: 1,
-					name: 'dustin'
-				},
-				{
-					type: 1,
-					id: 1,
-					name: 'dustin'
-				}
-			],
-			[
-				{
-					type: 2,
-					id: 1,
-					name: 'dustin'
-				},
-				{
-					type: 2,
-					id: 1,
-					name: 'dustin'
-				}
-			]
-		])
-		*/
+		socket.on('base', function (data) {
+			console.log('base received', counter++)
+			render(data)
+		})
 	}
 
 }(window, document)

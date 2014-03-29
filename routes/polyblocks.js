@@ -6,7 +6,7 @@ var _sockets = null,
 	_blockid = 0,
 	_blockpos = 0,
 	_pid = 1,
-	_timeout = 100,
+	_timeout = 200,
 	x,
 	i, y,
 
