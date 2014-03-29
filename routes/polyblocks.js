@@ -11,10 +11,10 @@ var _sockets = null,
 	i, y,
 
 	keymap = {
-		down: function (player) {
+		up: function (player) {
 			player.rotation = (player.rotation + 1) % 4
 		},
-		up: function (player) {
+		down: function (player) {
 			player.rotation--
 			if (player.rotation === -1)
 				player.rotation = 4
@@ -30,12 +30,12 @@ var _sockets = null,
 		}
 	},
 	revert = {
-		down: function (player) {
+		up: function (player) {
 			player.rotation--
 			if (player.rotation === -1)
 				player.rotation = 4
 		},
-		up: function (player) {
+		down: function (player) {
 			player.rotation = (player.rotation + 1) % 4
 		},
 		right: function (player) {
@@ -70,12 +70,12 @@ function sendBaseData() {
 }
 
 function gameloop() {
-	console.time('gameloop')
+	// console.time('gameloop')
 	movePiecesDown()
 	//checkPlacement()
 	//checkLines()
 	sendBaseData()
-	console.timeEnd('gameloop')
+	// console.timeEnd('gameloop')
 	setTimeout(gameloop,_timeout)
 }
 
@@ -101,7 +101,7 @@ function newPiece(player) {
 }
 
 function recvUpdate(data) {
-	console.time('update')
+	// console.time('update')
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid == this.pid){
 			player = _player[i]
@@ -112,7 +112,7 @@ function recvUpdate(data) {
 		revert[data](player)
 	}
 	sendBaseData()
-	console.timeEnd('update')
+	// console.timeEnd('update')
 }
 
 function recvDisconnect(data) {
