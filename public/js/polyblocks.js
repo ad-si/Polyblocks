@@ -39,6 +39,10 @@
 				stage = new createjs.Stage(canvas)
 
 			if (firstCall === true) {
+
+				console.log(data.field.length)
+				console.log(data.field[0].length)
+
 				canvas.setAttribute('width', String(pixelSize * data.field[0].length))
 				canvas.setAttribute('height', String(pixelSize * data.field.length))
 				firstCall = false
@@ -48,7 +52,7 @@
 
 				var x = player.position[0],
 					y = player.position[1],
-					matrix = rotateMatrix(shared.types[player.type], player.rotation),
+					matrix = shared.rotateMatrix(shared.types[player.type], player.rotation),
 					dx,
 					dy
 
