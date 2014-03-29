@@ -8,7 +8,42 @@ var _sockets = null,
 	_pid = 1,
 	_timeout = 500,
 	x,
-	i, y
+	i, y,
+
+	keymap = {
+		up: function (player) {
+			// player.position[1]++
+		},
+		down: function (player) {
+			player.position[1]++	
+		},
+		right: function (player) {
+			player.position[0]++
+		},
+		left: function (player) {
+			player.position[0]--
+		},
+		space: function (player) {
+			player.rotation = (player.rotation + 1) % 4
+		}
+	},
+	revert = {
+		up: function (player) {
+			// player.position[1]++
+		},
+		down: function (player) {
+			player.position[1]--	
+		},
+		right: function (player) {
+			player.position[0]--
+		},
+		left: function (player) {
+			player.position[0]++
+		},
+		space: function (player) {
+			player.rotation = (player.rotation - 1) % 4
+		}
+	}
 
 
 if (typeof module === "object" && module && typeof module.exports === "object"){
@@ -55,17 +90,24 @@ function newPiece(player) {
 	_blockpos=_blockpos+5
 	player.position = [_blockpos%_field.length, 0]
 	player.rotation = 0
-	player.type = 0,
+	player.type = Math.floor(Math.random()*8),
 	player.id = _blockid++
 }
 
 function recvUpdate(data) {
-	//console.log(data)
-	//handle movement
-	//sendBaseData()
+	for (var i = 0; i < _player.length; i++) {
+		if (_player[i].pid == this.pid){
+			player = _player[i]
+		}
+	}
+	keymap[data](player)
+	if (isColliding(player)){
+		revert[data](player)
+	}
+	sendBaseData()
 }
 
-function recvDisconnect(data,socket) {
+function recvDisconnect(data) {
 	console.log('disconnect')
 	_field = newMatrix(20,20)
 	pidToDelete = -1;
@@ -101,6 +143,7 @@ function placePiece(player){
 			}
 		}
 	}
+	newPiece(player)
 }
 
 function isColliding(player){

@@ -4,20 +4,25 @@
 
 
 		var keymap = {
-				up: function () {
-					socket.emit('up')
+				up: function (event) {
+					event.preventDefault()
+					socket.emit('update', 'up')
 				},
-				down: function () {
-					socket.emit('down')
+				down: function (event) {
+					event.preventDefault()
+					socket.emit('update', 'down')
 				},
-				right: function () {
-					socket.emit('right')
+				right: function (event) {
+					event.preventDefault()
+					socket.emit('update', 'right')
 				},
-				left: function () {
-					socket.emit('left')
+				left: function (event) {
+					event.preventDefault()
+					socket.emit('update', 'left')
 				},
-				space: function () {
-					socket.emit('space')
+				space: function (event) {
+					event.preventDefault()
+					socket.emit('update', 'space')
 				}
 			},
 			i
@@ -67,6 +72,7 @@
 
 
 		socket.on('base', function (data) {
+			console.log('base received')
 			render(data)
 		})
 
