@@ -1,0 +1,23 @@
+{
+  "name": "hammerjs",
+  "version": "1.0.10",
+  "main": "hammer.js",
+  "ignore": [
+    "tests",
+    "component.json",
+    "package.json",
+    "examples",
+    "src"
+  ],
+  "homepage": "https://github.com/EightMedia/hammer.js",
+  "_release": "1.0.10",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.10",
+    "commit": "9345655b03662c26fcdef851a6a4526cde468b1c"
+  },
+  "_source": "git://github.com/EightMedia/hammer.js.git",
+  "_target": "~1.0.10",
+  "_originalSource": "hammerjs",
+  "_direct": true
+}
