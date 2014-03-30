@@ -59,10 +59,6 @@
 				stage = new createjs.Stage(canvas)
 
 			if (firstCall === true) {
-
-				console.log(data.field.length)
-				console.log(data.field[0].length)
-
 				canvas.setAttribute('width', String(pixelSize * data.field[0].length) + 'px')
 				canvas.setAttribute('height', String(pixelSize * data.field.length) + 'px')
 				firstCall = false
@@ -79,7 +75,11 @@
 				for (dy = 0; dy < matrix.length; dy++)
 					for (dx = 0; dx < matrix[0].length; dx++)
 						if (matrix[dy][dx])
-							data.field[dx + x][dy + y] = 1
+							data.field[dx + x][dy + y] = {
+								id: player.id,
+								owner: player.pid,
+								type: player.type
+							}
 			})
 
 			data.field.forEach(function (column, x) {
@@ -87,7 +87,15 @@
 
 					if (pixel) {
 						var rect = new createjs.Shape(),
-							color = 'rgb(255,50,50)'
+							colorArray = [
+									(pixel.owner * 100) % 360,
+									60 + ((pixel.type * 123) % 40) + '%',
+									40 + ((pixel.type * 123) % 40) + '%'
+									//(pixel.id * 123) % 50 + '%'
+							],
+							color = 'hsl(' + colorArray.join() + ')'
+
+						console.log(pixel.owner)
 
 						rect
 							.graphics
@@ -124,6 +132,7 @@
 
 
 		socket.on('base', function (data) {
+			console.log(data)
 			render(data)
 		})
 	}
