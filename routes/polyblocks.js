@@ -12,7 +12,7 @@ var _sockets = null,
 	_pid = 1,
 	_clearedLines = 0,
 	_gameloop,
-	timeout,
+	_timeout,
 	x,
 	i, y,
 	_gameover = false
@@ -89,7 +89,6 @@ function startGame(){
 	_gameover = false
 	_clearedLines = 0
 	_field = shared.newMatrix(_HEIGHT,_WIDTH)
-	_pid = 1
 	clearTimeout(_gameloop)
 	gameloop()
 }
@@ -103,11 +102,15 @@ function stopGame(){
 function gameloop() {
 	movePiecesDown()
 	sendBaseData()
+
 	timeout = Math.floor((_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed)
-	// console.log('speed: '+timeout+'ms')
 	if (!_gameover){
 		_gameloop = setTimeout(gameloop, timeout)
 	}
+	if (timeout !== _timeout){
+		console.log(('Line cleared. New Speed: '+timeout+'ms').italic.yellow)
+	}
+	_timeout = timeout
 }
 
 function newPlayer(socket) {
@@ -151,14 +154,14 @@ function recvUpdate(data) {
 }
 
 function recvDisconnect(data) {
+	console.log(('Player '+this.pid+' leaved the game').grey)
 	indexToDelete = -1;
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid === this.pid){
 			indexToDelete = i
 		}
 	}
-	_player.splice(indexToDelete)
-	console.log(('Player '+this.pid+' leaved the game').grey)
+	_player.splice(indexToDelete, 1)
 	if (_player.length === 0){stopGame()}
 }
 
