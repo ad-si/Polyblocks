@@ -1,4 +1,5 @@
 var shared = require('../public/js/shared.js')
+var colors = require('colors')
 
 var _sockets = null,
 	_WIDTH = 10,
@@ -10,10 +11,10 @@ var _sockets = null,
 	_blockid = 0,
 	_pid = 1,
 	_clearedLines = 0,
+	_gameloop,
 	timeout,
 	x,
 	i, y,
-	_gameloop,
 	_gameover = false
 
 	keymap = {
@@ -66,10 +67,6 @@ if (typeof module === "object" && module && typeof module.exports === "object"){
 	exports.init = function (sockets) {
 		_sockets = sockets
 		_sockets.on('connection', newPlayer)
-		Math.random()
-		Math.random()
-		Math.random()
-		gameloop()
 	}
 }
 
@@ -82,30 +79,51 @@ function sendBaseData() {
 }
 
 function gameover(){
-	_gameover = true
+	console.log('Game Over'.red.bold)
+	stopGame()
 	_sockets.emit('gameover', {players: _player, field: _field, score:_clearedLines})
+}
+
+function startGame(){
+	console.log('Starting the game'.green.underline)
+	_gameover = false
+	_clearedLines = 0
+	_field = shared.newMatrix(_HEIGHT,_WIDTH)
+	_pid = 1
+	clearTimeout(_gameloop)
+	gameloop()
+}
+
+function stopGame(){
+	console.log('Stopping the game'.red.underline)
+	_gameover = true
 	clearTimeout(_gameloop)
 }
 
 function gameloop() {
 	movePiecesDown()
 	sendBaseData()
-	timeout = (_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed
+	timeout = Math.floor((_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed)
 	// console.log('speed: '+timeout+'ms')
-	_gameloop = setTimeout(gameloop, timeout)
+	if (!_gameover){
+		_gameloop = setTimeout(gameloop, timeout)
+	}
 }
 
 function newPlayer(socket) {
-	_player.push(_playerproto = {
-		pid: ++_pid,
+	if (_player.length===0){startGame()}
+	pid = _pid++
+	_player.push({
+		pid: pid,
 		name: 'rnd'
 	})
 	newPiece(_player[_player.length-1])
-
 	socket.on('update', recvUpdate)
 	socket.on('disconnect', recvDisconnect)
-	socket['pid']=_pid
+	socket['pid']=pid
+	
 	sendBaseData()
+	console.log(('Player '+pid+' joined the game').cyan)
 }
 
 function newPiece(player) {
@@ -120,7 +138,6 @@ function newPiece(player) {
 
 function recvUpdate(data) {
 	if (_gameover){return}
-	// console.time('update')
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid == this.pid){
 			player = _player[i]
@@ -131,23 +148,18 @@ function recvUpdate(data) {
 		revert[data](player)
 	}
 	sendBaseData()
-	// console.timeEnd('update')
 }
 
 function recvDisconnect(data) {
-	console.log('disconnect')
-	_clearedLines = 0
-	_field = shared.newMatrix(_HEIGHT,_WIDTH)
-	pidToDelete = -1;
+	indexToDelete = -1;
 	for (var i = 0; i < _player.length; i++) {
-		if (_player[i].pid == this.pid){
-			pidToDelete = this.pid
+		if (_player[i].pid === this.pid){
+			indexToDelete = i
 		}
 	}
-	_player = _player.splice(pidToDelete, 1)
-
-	if (_gameover){gameloop()}
-	_gameover = false
+	_player.splice(indexToDelete)
+	console.log(('Player '+this.pid+' leaved the game').grey)
+	if (_player.length === 0){stopGame()}
 }
 
 function movePiecesDown() {
