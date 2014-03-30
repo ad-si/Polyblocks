@@ -126,7 +126,8 @@ function newPlayer(socket) {
 	pid = _pid++
 	_player.push({
 		pid: pid,
-		name: 'rnd'
+		name: 'rnd',
+		score: 0
 	})
 	newPiece(_player[_player.length-1])
 	socket.on('update', recvUpdate)
@@ -187,7 +188,7 @@ function movePiecesDown() {
 	}
 }
 
-function clearFinishedLines(){
+function clearFinishedLines(player){
 	y = _HEIGHT-1
 	while (y >= 0) {
 		cleared = true
@@ -198,6 +199,7 @@ function clearFinishedLines(){
 		}
 		if (cleared){
 			_clearedLines++
+			player.score++
 			for (i = y-1; i >= 0; i--){
 				for (x = 0; x <_WIDTH; x++) {
 					_field[x][i+1] = _field[x][i]
@@ -223,7 +225,7 @@ function placePiece(player){
 		}
 	}
 	newPiece(player)
-	clearFinishedLines();
+	clearFinishedLines(player);
 }
 
 function isColliding(player){
