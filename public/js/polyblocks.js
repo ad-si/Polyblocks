@@ -59,8 +59,8 @@
 				stage = new createjs.Stage(canvas)
 
 			if (firstCall === true) {
-				canvas.setAttribute('width', String(pixelSize * data.field[0].length) + 'px')
-				canvas.setAttribute('height', String(pixelSize * data.field.length) + 'px')
+				canvas.setAttribute('width', String(pixelSize * data.field.length) + 'px')
+				canvas.setAttribute('height', String(pixelSize * data.field[0].length) + 'px')
 				firstCall = false
 			}
 
@@ -107,6 +107,8 @@
 					}
 				})
 			})
+
+			document.getElementById('score').innerHTML = data.score
 		}
 
 

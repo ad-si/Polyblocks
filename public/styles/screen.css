@@ -2,11 +2,14 @@
   border: 0;
   padding: 0;
   margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 body {
-  background-color: #c8c8c8;
+  background-color: #cdcdcd;
   font-size: 16px;
+  font-family: Arial, sans-serif;
 }
 h1 {
   font-size: 4em;
@@ -25,6 +28,15 @@ h1 {
 }
 @media (max-width: 1200px) {
   #wrapper {
+    width: 100%;
+  }
+}
+@media (max-width: 800px) {
+  h1 {
+    font-size: 1em;
+  }
+  #wrapper {
+    padding: 0.1em 0;
     width: 100%;
   }
 }
