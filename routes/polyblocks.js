@@ -2,17 +2,17 @@ var shared = require('../public/js/shared.js')
 var colors = require('colors')
 
 var _sockets = null,
-	_WIDTH = 10,
+	_WIDTH = 15,
 	_HEIGHT = 30,
 	_minSpeed = 500,
 	_maxSpeed = 50,
-	_field = shared.newMatrix(_HEIGHT, _WIDTH),
+	_field,
 	_player = [],
 	_blockid = 0,
 	_pid = 1,
 	_clearedLines = 0,
 	_gameloop,
-	timeout,
+	_timeout,
 	x,
 	i, y,
 	_gameover = false
@@ -24,7 +24,7 @@ var _sockets = null,
 		down: function (player) {
 			player.rotation--
 			if (player.rotation === -1)
-				player.rotation = 4
+				player.rotation = 3
 		},
 		right: function (player) {
 			player.position[0]++
@@ -44,7 +44,7 @@ var _sockets = null,
 		up: function (player) {
 			player.rotation--
 			if (player.rotation === -1)
-				player.rotation = 4
+				player.rotation = 3
 		},
 		down: function (player) {
 			player.rotation = (player.rotation + 1) % 4
@@ -88,8 +88,7 @@ function startGame(){
 	console.log('Starting the game'.green.underline)
 	_gameover = false
 	_clearedLines = 0
-	_field = shared.newMatrix(_HEIGHT,_WIDTH)
-	_pid = 1
+	_field = shared.newMatrix(_WIDTH,_HEIGHT)
 	clearTimeout(_gameloop)
 	gameloop()
 }
@@ -103,11 +102,15 @@ function stopGame(){
 function gameloop() {
 	movePiecesDown()
 	sendBaseData()
+
 	timeout = Math.floor((_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed)
-	// console.log('speed: '+timeout+'ms')
 	if (!_gameover){
 		_gameloop = setTimeout(gameloop, timeout)
 	}
+	if (timeout !== _timeout){
+		console.log(('Line cleared. New Speed: '+timeout+'ms').italic.yellow)
+	}
+	_timeout = timeout
 }
 
 function newPlayer(socket) {
@@ -124,6 +127,7 @@ function newPlayer(socket) {
 	
 	sendBaseData()
 	console.log(('Player '+pid+' joined the game').cyan)
+	extendField()
 }
 
 function newPiece(player) {
@@ -151,14 +155,14 @@ function recvUpdate(data) {
 }
 
 function recvDisconnect(data) {
+	console.log(('Player '+this.pid+' leaved the game').grey)
 	indexToDelete = -1;
 	for (var i = 0; i < _player.length; i++) {
 		if (_player[i].pid === this.pid){
 			indexToDelete = i
 		}
 	}
-	_player.splice(indexToDelete)
-	console.log(('Player '+this.pid+' leaved the game').grey)
+	_player.splice(indexToDelete, 1)
 	if (_player.length === 0){stopGame()}
 }
 
@@ -226,5 +230,11 @@ function isColliding(player){
 		}
 	}
 	return false
+}
+
+function extendField(matrix, n){
+	nMatrix = shared.newMatrix(_WIDTH+5, _HEIGHT)
+	_WIDTH+=5
+	_field = nMatrix
 }
 

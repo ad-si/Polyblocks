@@ -11,6 +11,11 @@
         <script>
 
         var keymap = {
+        _32: function (event) {
+          event.preventDefault()
+          console.log('space')
+          socket.emit('update', 'space')
+        },
         _38: function (event) {
           event.preventDefault()
           console.log('up')
@@ -166,7 +171,7 @@ function newMatrix(n, m) {
           // socket.emit('update', { my: 'data' });
 
           $(document).keydown(function(e){
-            if (e.keyCode < 41 && e.keyCode > 36) { 
+            if ((e.keyCode < 41 && e.keyCode > 36) || e.keyCode == 32) { 
                keymap['_'+e.keyCode](e);
             }
         });
