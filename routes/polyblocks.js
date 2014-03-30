@@ -4,6 +4,8 @@ var colors = require('colors')
 var _sockets = null,
 	_WIDTH = 15,
 	_HEIGHT = 30,
+	_start_width = 15,
+	_start_height = 30,
 	_minSpeed = 500,
 	_maxSpeed = 50,
 	_field,
@@ -85,11 +87,13 @@ function gameover(){
 }
 
 function startGame(){
-	console.log('Starting the game'.green.underline)
-	_gameover = false
-	_clearedLines = 0
-	_field = shared.newMatrix(_WIDTH,_HEIGHT)
 	clearTimeout(_gameloop)
+	console.log('Starting the game'.green.underline)
+	_clearedLines = 0
+	_WITH = _start_width
+	_HEIGHT = _start_height
+	_field = shared.newMatrix(_start_width, _start_height)
+	_gameover = false
 	gameloop()
 }
 
@@ -114,7 +118,11 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-	if (_player.length===0){startGame()}
+	if (_player.length===0){
+		startGame()
+	} else {
+		extendField()
+	}
 	pid = _pid++
 	_player.push({
 		pid: pid,
@@ -124,14 +132,12 @@ function newPlayer(socket) {
 	socket.on('update', recvUpdate)
 	socket.on('disconnect', recvDisconnect)
 	socket['pid']=pid
-	
 	sendBaseData()
-	console.log(('Player '+pid+' joined the game').cyan)
-	extendField()
+	console.log(('Player '+pid+' joined the game').cyan)	
 }
 
 function newPiece(player) {
-	player.position = [randomInt(0, _WIDTH-5), 0]
+	player.position = [randomInt(0, _WIDTH-3), 0]
 	player.rotation = 0
 	player.type = randomInt(0, 8),
 	player.id = _blockid++
@@ -163,7 +169,12 @@ function recvDisconnect(data) {
 		}
 	}
 	_player.splice(indexToDelete, 1)
-	if (_player.length === 0){stopGame()}
+	if (_player.length === 0){
+		stopGame()
+	} else {
+		reduceField()
+		sendBaseData()
+	}
 }
 
 function movePiecesDown() {
@@ -232,9 +243,26 @@ function isColliding(player){
 	return false
 }
 
-function extendField(matrix, n){
-	nMatrix = shared.newMatrix(_WIDTH+5, _HEIGHT)
-	_WIDTH+=5
+function extendField(){
+	nMatrix = shared.newMatrix(_WIDTH+1, _HEIGHT)
+	for (var x = 0; x < _WIDTH; x++) {
+		for (var y = 0; y < _HEIGHT; y++) {
+			nMatrix[x][y] = _field[x][y]
+		}	
+	}
 	_field = nMatrix
+	_WIDTH++
 }
 
+function reduceField(){
+	
+	nMatrix = shared.newMatrix(_WIDTH-1, _HEIGHT)
+	for (var x = 0; x < _WIDTH-1; x++) {
+		for (var y = 0; y < _HEIGHT; y++) {
+			nMatrix[x][y] = _field[x][y]
+		}	
+	}	
+	_WIDTH--
+	_field = nMatrix
+
+}
