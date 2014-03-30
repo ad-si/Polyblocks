@@ -23,6 +23,15 @@ h1 {
   text-align: center;
   padding: 50px 40px;
 }
+#htmlCanvas {
+  position: relative;
+  height: 400px;
+  width: 400px;
+  background-color: #c8c8c8;
+}
+.pixel {
+  position: absolute;
+}
 #canvas {
   background-color: #c8c8c8;
 }

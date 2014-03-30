@@ -56,11 +56,69 @@
 		function render(data) {
 
 			var pixelSize = 14,
-				stage = new createjs.Stage(canvas)
+			//stage = new createjs.Stage(canvas),
+				$htmlCanvas = $('#htmlCanvas')
+
+
+			function drawOnCanvas(x, y, pixel) {
+
+				var rect = new createjs.Shape(),
+					colorArray = [
+							(pixel.owner * 100) % 360,
+							60 + ((pixel.type * 123) % 40) + '%',
+							40 + ((pixel.type * 123) % 40) + '%'
+						//(pixel.id * 123) % 50 + '%'
+					],
+					color = 'hsl(' + colorArray.join() + ')'
+
+				rect
+					.graphics
+					.beginFill(color)
+					.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
+
+				stage.addChild(rect)
+				stage.scaleX = 0.5
+				stage.update()
+			}
+
+
+			function drawHTML(x, y, pixel) {
+
+				var colorArray = [
+							(pixel.owner * 100) % 360,
+							60 + ((pixel.type * 123) % 40) + '%',
+							40 + ((pixel.type * 123) % 40) + '%'
+						//(pixel.id * 123) % 50 + '%'
+					],
+					color = 'hsl(' + colorArray.join() + ')',
+					pixelElement = $('div.pixel')
+
+					pixelElement.css({
+						width: 1 / data.field.length,
+						height: 1 / data.field[0].length,
+						'background-color': color,
+						left: pixelSize * x,
+						top: pixelSize * y
+					})
+
+				console.log(pixelElement[0])
+
+				$htmlCanvas
+					.append(pixelElement)
+				//.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
+
+				//stage.addChild(rect)
+				//stage.scaleX = 0.5
+				//stage.update()
+			}
+
+			//$htmlCanvas.html('')
 
 			if (firstCall === true) {
-				canvas.setAttribute('width', String(pixelSize * data.field.length) + 'px')
-				canvas.setAttribute('height', String(pixelSize * data.field[0].length) + 'px')
+				//canvas.setAttribute('width', String(pixelSize * data.field.length) + 'px')
+				$htmlCanvas.css({width: String(pixelSize * data.field.length) + 'px'})
+				//canvas.setAttribute('height', String(pixelSize * data.field[0].length) + 'px')
+				$htmlCanvas.css({'height': String(pixelSize * data.field[0].length) + 'px'})
 				firstCall = false
 			}
 
@@ -85,26 +143,9 @@
 			data.field.forEach(function (column, x) {
 				column.forEach(function (pixel, y) {
 
-					if (pixel) {
-						var rect = new createjs.Shape(),
-							colorArray = [
-									(pixel.owner * 100) % 360,
-									60 + ((pixel.type * 123) % 40) + '%',
-									40 + ((pixel.type * 123) % 40) + '%'
-									//(pixel.id * 123) % 50 + '%'
-							],
-							color = 'hsl(' + colorArray.join() + ')'
-
-						console.log(pixel.owner)
-
-						rect
-							.graphics
-							.beginFill(color)
-							.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
-
-						stage.addChild(rect)
-						stage.update()
-					}
+					if (pixel)
+						drawHTML(x, y, pixel)
+					//drawOnCanvas(x, y, pixel)
 				})
 			})
 
