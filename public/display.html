@@ -1,0 +1,63 @@
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <div id="show"></div>
+
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+          var socket = io.connect('http://localhost');
+          var field = [];
+          socket.on('base', function (data) {
+            console.time('render')
+               $('#show').empty();
+               $('#show').append(data.field[0].length);
+               for (var i = 0; i < data.field.length; i++) {
+                    $('#show').append("<br>");
+                    for (var j = 0; j < data.field[i].length; j++) {
+                      if (data.field[i][j]){
+                        $('#show').append('<span style="color:#0f0">X</span>');
+                      } else {
+                        $('#show').append('<span style="color:#ddd">O</span>');
+                      }
+                      
+                    };
+                    $('#show').append("    "+i);
+               }
+
+               $('#show').append("<br>pos: "+ data.players[0].position);
+               console.timeEnd('render')
+          });
+          // socket.emit('update', { my: 'data' });
+
+          $(document).keydown(function(e){
+            if ((e.keyCode < 41 && e.keyCode > 36) || e.keyCode == 32) { 
+               keymap['_'+e.keyCode](e);
+            }
+        });
+        </script>
+    </body>
+</html>
+
+<!-- data example
+
+  {
+    players: [
+            {name:"dustin",
+            position: [0,0],
+            rotation: 90,
+            type: 1,
+            id: 800}
+
+                ],
+    field: [
+            [{type:1,owner:1,id:1},...],
+            [{type:1,owner:1,id:1},...],
+            ...
+            [undefinded],
+            ...
+            ]
+
+} -->

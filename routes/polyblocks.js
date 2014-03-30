@@ -2,11 +2,11 @@ var shared = require('../public/js/shared.js')
 var colors = require('colors')
 
 var _sockets = null,
-	_WIDTH = 10,
+	_WIDTH = 15,
 	_HEIGHT = 30,
 	_minSpeed = 500,
 	_maxSpeed = 50,
-	_field = shared.newMatrix(_HEIGHT, _WIDTH),
+	_field,
 	_player = [],
 	_blockid = 0,
 	_pid = 1,
@@ -24,7 +24,7 @@ var _sockets = null,
 		down: function (player) {
 			player.rotation--
 			if (player.rotation === -1)
-				player.rotation = 4
+				player.rotation = 3
 		},
 		right: function (player) {
 			player.position[0]++
@@ -44,7 +44,7 @@ var _sockets = null,
 		up: function (player) {
 			player.rotation--
 			if (player.rotation === -1)
-				player.rotation = 4
+				player.rotation = 3
 		},
 		down: function (player) {
 			player.rotation = (player.rotation + 1) % 4
@@ -88,7 +88,7 @@ function startGame(){
 	console.log('Starting the game'.green.underline)
 	_gameover = false
 	_clearedLines = 0
-	_field = shared.newMatrix(_HEIGHT,_WIDTH)
+	_field = shared.newMatrix(_WIDTH,_HEIGHT)
 	clearTimeout(_gameloop)
 	gameloop()
 }
@@ -127,6 +127,7 @@ function newPlayer(socket) {
 	
 	sendBaseData()
 	console.log(('Player '+pid+' joined the game').cyan)
+	extendField()
 }
 
 function newPiece(player) {
@@ -229,5 +230,11 @@ function isColliding(player){
 		}
 	}
 	return false
+}
+
+function extendField(matrix, n){
+	nMatrix = shared.newMatrix(_WIDTH+5, _HEIGHT)
+	_WIDTH+=5
+	_field = nMatrix
 }
 
