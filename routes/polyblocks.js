@@ -2,7 +2,7 @@ var shared = require('../public/js/shared.js')
 var colors = require('colors')
 
 var _sockets = null,
-	_WIDTH = 15,
+	_WIDTH = 40,
 	_HEIGHT = 30,
 	_start_width = 15,
 	_start_height = 30,
@@ -95,10 +95,14 @@ function startGame(){
 	clearTimeout(_gameloop)
 	console.log('Starting the game'.green.underline)
 	_clearedLines = 0
-	_WITH = _start_width
+	_WITH = _start_width + (_player.length-1)
 	_HEIGHT = _start_height
 	_field = shared.newMatrix(_start_width, _start_height)
 	_gameover = false
+	for (var i = 0; i < _player.length; i++) {
+		_player[i].score = 0
+		newPiece(_player[i])
+	}
 	gameloop()
 }
 
