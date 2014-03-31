@@ -24,18 +24,24 @@ h1 {
   padding: 50px 40px;
 }
 #htmlCanvas {
-  position: relative;
-  height: 400px;
-  width: 400px;
   background-color: #c8c8c8;
+  position: relative;
+  max-width: 600px;
   margin: 0 auto;
+  -webkit-transition-property: 920px, height;
+  -moz-transition-property: 920px, height;
+  -o-transition-property: 920px, height;
+  -ms-transition-property: 920px, height;
+  transition-property: 920px, height;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  -ms-transition-duration: 0.2s;
+  transition-duration: 0.2s;
 }
 .pixel {
   position: absolute;
   display: block;
-}
-#canvas {
-  background-color: #c8c8c8;
 }
 @media (max-width: 1200px) {
   #wrapper {
@@ -49,5 +55,8 @@ h1 {
   #wrapper {
     padding: 0.1em 0;
     width: 100%;
+  }
+  #htmlCanvas {
+    max-width: 100%;
   }
 }

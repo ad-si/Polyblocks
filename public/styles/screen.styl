@@ -32,18 +32,17 @@ h1
 	padding: 50px 40px
 
 #htmlCanvas
-	position relative
-	height 400px
-	width 400px
 	background-color gray(200)
+	position relative
+	max-width 600px
 	margin 0 auto
+	transition-property width, height
+	transition-duration 0.2s
 
 .pixel
 	position absolute
 	display block
 
-#canvas
-	background-color gray(200)
 
 
 @media (max-width: 1200px)
@@ -54,9 +53,13 @@ h1
 @media (max-width: 800px)
 	h1
 		font-size 1em
+
 	#wrapper
 		padding: 0.1em 0
 		width 100%
+
+	#htmlCanvas
+		max-width 100%
 
 
 

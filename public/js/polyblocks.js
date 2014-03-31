@@ -1,36 +1,208 @@
 !function (window, document) {
 
+	var counter = 0,
+		scoreContainer = document.getElementById('score')
+
+	function render(data, containerElement) {
+
+		var pixelSize = 14,
+			maxWidth = 600,
+			width,
+			height,
+			newPixelSize,
+			x,
+			y
+		//stage = new createjs.Stage(canvas)
+
+
+		function drawOnCanvas(x, y, pixel) {
+
+			var rect = new createjs.Shape(),
+				colorArray = [
+						(pixel.owner * 100) % 360,
+						60 + ((pixel.type * 123) % 40) + '%',
+						40 + ((pixel.type * 123) % 40) + '%'
+					//(pixel.id * 123) % 50 + '%'
+				],
+				color = 'hsl(' + colorArray.join() + ')'
+
+			rect
+				.graphics
+				.beginFill(color)
+				.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
+
+			stage.addChild(rect)
+			stage.scaleX = 0.5
+			stage.update()
+		}
+
+		function drawHTML(x, y, pixel) {
+
+			var colorArray = [
+						(pixel.owner * 100) % 360,
+						60 + ((pixel.type * 123) % 40) + '%',
+						40 + ((pixel.type * 123) % 40) + '%'
+					//(pixel.id * 123) % 50 + '%'
+				],
+				color = 'hsl(' + colorArray.join(',') + ')',
+			//$pixelElement = $('<div class="pixel"></div>'),
+				pixelElement = document.createElement('div'),
+				style = {
+					width: 1 / data.field.length * 100 + '%',
+					height: 1 / data.field[0].length * 100 + '%',
+					left: (x / data.field.length) * 100 + '%',
+					top: (y / data.field[0].length) * 100 + '%',
+					'background-color': color
+				},
+				styleString = JSON
+					.stringify(style, function (key, value) {
+						return (typeof value === 'string') ?
+							value.replace(/,/g, '$') :
+							value
+					})
+					.replace(/,/g, ';')
+					.replace(/\$/g, ',')
+					.replace(/"/g, '')
+					.replace(/^\{(.*)\}$/g, '$1')
+
+			pixelElement.className = 'pixel'
+			pixelElement.setAttribute('style', styleString)
+
+			containerElement.appendChild(pixelElement)
+		}
+
+		function drawHtmlInc(x, y, pixel) {
+
+			var colorArray = [
+						(pixel.owner * 100) % 360,
+						60 + ((pixel.type * 123) % 40) + '%',
+						40 + ((pixel.type * 123) % 40) + '%'
+					//(pixel.id * 123) % 50 + '%'
+				],
+				color = 'hsl(' + colorArray.join() + ')',
+				$pixelElement = $('<div class="pixel"></div>')
+
+			$pixelElement.css({
+				width: 1 / data.field.length * 100 + '%',
+				height: 1 / data.field[0].length * 100 + '%',
+				left: (x / data.field.length) * 100 + '%',
+				top: (y / data.field[0].length) * 100 + '%',
+				'background-color': color
+			})
+
+
+			$pixelElement.appendTo($htmlCanvas)
+		}
+
+
+		containerElement.innerHTML = ''
+
+		newPixelSize = maxWidth / data.field.length
+
+		if(newPixelSize < pixelSize){
+			pixelSize = newPixelSize
+			width = newPixelSize * data.field.length
+			height = newPixelSize * data.field[0].length
+		}
+		else {
+			width = pixelSize * data.field.length
+			height = pixelSize * data.field[0].length
+		}
+
+		containerElement.setAttribute('style',
+				'width:' + width + 'px;' +
+				'height:' + height + 'px'
+		)
+
+
+		data.players.forEach(function (player) {
+
+			var x = player.position[0],
+				y = player.position[1],
+				matrix = shared.rotateMatrix(shared.types[player.type], player.rotation),
+				dx,
+				dy
+
+			for (dy = 0; dy < matrix.length; dy++)
+				for (dx = 0; dx < matrix[0].length; dx++)
+					if (matrix[dy][dx])
+						data.field[dx + x][dy + y] = {
+							id: player.id,
+							owner: player.pid,
+							type: player.type
+						}
+		})
+
+		// Better performance than forEach
+		for (x = 0; x < data.field.length; x++)
+			for (y = 0; y < data.field[0].length; y++)
+
+				if (data.field[x][y])
+					drawHTML(x, y, data.field[x][y])
+
+
+		/*data.field.forEach(function (column, x) {
+		 column.forEach(function (pixel, y) {
+
+		 if (pixel){
+
+		 drawHTML(x, y, pixel)
+		 //drawOnCanvas(x, y, pixel)
+		 }
+		 })
+		 })*/
+
+		scoreContainer.innerHTML = data.score
+
+		console.timeEnd('render')
+	}
+
+
 	window.polyblocks = function (socket, canvas) {
 
-
 		var modifications = {
-				rotateRight: function (event) {
-					//event.preventDefault()
+				rotateRight: function () {
+					console.time('socket')
 					socket.emit('update', 'up')
 				},
-				rotateLeft: function (event) {
-					//event.preventDefault()
+				rotateLeft: function () {
+					console.time('socket')
 					socket.emit('update', 'down')
 				},
-				moveRight: function (event) {
-					//event.preventDefault()
+				moveRight: function () {
+					console.time('socket')
 					socket.emit('update', 'right')
 				},
-				moveLeft: function (event) {
-					//event.preventDefault()
+				moveLeft: function () {
+					console.time('socket')
 					socket.emit('update', 'left')
 				},
-				moveDown: function (event) {
-					//event.preventDefault()
+				moveDown: function () {
+					console.time('socket')
 					socket.emit('update', 'space')
 				}
 			},
 			keymap = {
-				up: modifications.rotateRight,
-				right: modifications.moveRight,
-				down: modifications.rotateLeft,
-				left: modifications.moveLeft,
-				space: modifications.moveDown
+				up: function (event) {
+					event.preventDefault()
+					modifications.rotateRight()
+				},
+				right: function (event) {
+					event.preventDefault()
+					modifications.moveRight()
+				},
+				down: function (event) {
+					event.preventDefault()
+					modifications.rotateLeft()
+				},
+				left: function (event) {
+					event.preventDefault()
+					modifications.moveLeft()
+				},
+				space: function (event) {
+					event.preventDefault()
+					modifications.moveDown()
+				}
 			},
 			touchMap = {
 				swipeup: modifications.rotateRight,
@@ -46,104 +218,7 @@
 				swipeleft: modifications.moveLeft,
 				dragleft: modifications.moveLeft
 			},
-			key,
-			gesture,
-			counter = 0,
-			firstCall = true,
-			i
-
-
-		function render(data) {
-
-			var pixelSize = 14,
-			//stage = new createjs.Stage(canvas),
-				$htmlCanvas = $('#htmlCanvas')
-
-
-			function drawOnCanvas(x, y, pixel) {
-
-				var rect = new createjs.Shape(),
-					colorArray = [
-							(pixel.owner * 100) % 360,
-							60 + ((pixel.type * 123) % 40) + '%',
-							40 + ((pixel.type * 123) % 40) + '%'
-						//(pixel.id * 123) % 50 + '%'
-					],
-					color = 'hsl(' + colorArray.join() + ')'
-
-				rect
-					.graphics
-					.beginFill(color)
-					.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
-
-				stage.addChild(rect)
-				stage.scaleX = 0.5
-				stage.update()
-			}
-
-
-			function drawHTML(x, y, pixel) {
-
-				var colorArray = [
-							(pixel.owner * 100) % 360,
-							60 + ((pixel.type * 123) % 40) + '%',
-							40 + ((pixel.type * 123) % 40) + '%'
-						//(pixel.id * 123) % 50 + '%'
-					],
-					color = 'hsl(' + colorArray.join() + ')',
-					$pixelElement = $('<div class="pixel"></div>')
-
-				$pixelElement.css({
-					width: 1 / data.field.length * 100  + '%',
-					height: 1 / data.field[0].length * 100  + '%',
-					left: (x / data.field.length) * 100 + '%',
-					top: (y / data.field[0].length) * 100 + '%',
-					'background-color': color
-				})
-
-
-				$pixelElement.appendTo($htmlCanvas)
-			}
-
-			$htmlCanvas.html('')
-
-			if (firstCall === true) {
-				//canvas.setAttribute('width', String(pixelSize * data.field.length) + 'px')
-				$htmlCanvas.css({width: String(pixelSize * data.field.length + 1.5) + 'px'})
-				//canvas.setAttribute('height', String(pixelSize * data.field[0].length) + 'px')
-				$htmlCanvas.css({'height': String(pixelSize * data.field[0].length) + 'px'})
-				firstCall = false
-			}
-
-			data.players.forEach(function (player) {
-
-				var x = player.position[0],
-					y = player.position[1],
-					matrix = shared.rotateMatrix(shared.types[player.type], player.rotation),
-					dx,
-					dy
-
-				for (dy = 0; dy < matrix.length; dy++)
-					for (dx = 0; dx < matrix[0].length; dx++)
-						if (matrix[dy][dx])
-							data.field[dx + x][dy + y] = {
-								id: player.id,
-								owner: player.pid,
-								type: player.type
-							}
-			})
-
-			data.field.forEach(function (column, x) {
-				column.forEach(function (pixel, y) {
-
-					if (pixel)
-						drawHTML(x, y, pixel)
-					//drawOnCanvas(x, y, pixel)
-				})
-			})
-
-			document.getElementById('score').innerHTML = data.score
-		}
+			key
 
 
 		for (key in keymap)
@@ -151,25 +226,16 @@
 				Mousetrap.bind(key, keymap[key])
 
 
-		/*document.body.addEventListener('touchmove', function(event){
-		 event.preventDefault()
-
-		 console.log(event)
-
-		 })*/
-
 		Hammer(document.body, {prevent_default: true})
 			.on('swipeup swipedown dragleft dragright tap', function (event) {
-
-				console.log(event.type)
-
 				touchMap[event.type]()
 			})
 
 
 		socket.on('base', function (data) {
-			console.log(data)
-			render(data)
+			console.timeEnd('socket')
+			//console.time('render')
+			render(data, canvas)
 		})
 	}
 

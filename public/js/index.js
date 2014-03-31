@@ -5,6 +5,6 @@ var socket
 // TODO: uncomment
 socket = io.connect()
 
-polyblocks(socket, document.getElementById('canvas'))
+polyblocks(socket, document.getElementById('htmlCanvas'))
 
 }(window, document)
