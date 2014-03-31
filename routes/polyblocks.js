@@ -201,7 +201,7 @@ function movePiecesDown() {
 
 function clearFinishedLines(player){
 	y = _HEIGHT-1
-	while (y >= 0) {
+	while (y > 0) {
 		cleared = true
 		for (x = 0; x <_WIDTH; x++) {
 			if (!_field[x][y]){
