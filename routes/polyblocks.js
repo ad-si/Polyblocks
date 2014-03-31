@@ -95,9 +95,9 @@ function startGame(){
 	clearTimeout(_gameloop)
 	console.log('Starting the game'.green.underline)
 	_clearedLines = 0
-	_WITH = _start_width + (_player.length-1)
+	_WIDTH = _start_width + (_player.length-1)
 	_HEIGHT = _start_height
-	_field = shared.newMatrix(_start_width, _start_height)
+	_field = shared.newMatrix(_WIDTH, _HEIGHT)
 	_gameover = false
 	for (var i = 0; i < _player.length; i++) {
 		_player[i].score = 0
