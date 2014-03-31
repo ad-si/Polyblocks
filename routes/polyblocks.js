@@ -12,6 +12,7 @@ var _sockets = null,
 	_field,
 	_player = [],
 	_blockid = 0,
+	_pixelid = 0,
 	_pid = 1,
 	_clearedLines = 0,
 	_gameloop,
@@ -118,7 +119,7 @@ function gameloop() {
 	movePiecesDown()
 	sendBaseData()
 
-	timeout = Math.floor((_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/20*_clearedLines)+_maxSpeed)
+	timeout = Math.floor((_minSpeed-_maxSpeed)*Math.pow(Math.E, -1/15*_clearedLines)+_maxSpeed)
 	if (!_gameover){
 		_gameloop = setTimeout(gameloop, timeout)
 	}
@@ -232,7 +233,7 @@ function placePiece(player){
 		for (var dx = 0; dx < matrix[0].length; dx++){
 			if (matrix[dy][dx]){
 				if (dx+x < _WIDTH && dy+y < _HEIGHT){
-					_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid}
+					_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid, pixelid:_pixelid++}
 				}
 			}
 		}
