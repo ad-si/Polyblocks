@@ -1,0 +1,62 @@
+gray(color, opacity = 1)
+	return rgba(color,color,color, opacity)
+
+width = 920px
+
+*
+	border 0
+	padding 0
+	margin 0
+	box-sizing border-box
+
+html
+	//height 100%
+
+body
+	//height 100%
+	background-color gray(205)
+	font-size 16px
+	font-family Arial, sans-serif
+
+h1
+	font-size 4em
+	font-family Helvetica
+	margin-bottom 1em
+
+#wrapper
+	//min-height 100%
+	width width
+	background-color white
+	margin 0 auto
+	text-align center
+	padding: 50px 40px
+
+#htmlCanvas
+	position relative
+	height 400px
+	width 400px
+	background-color gray(200)
+	margin 0 auto
+
+.pixel
+	position absolute
+	display block
+
+#canvas
+	background-color gray(200)
+
+
+@media (max-width: 1200px)
+	#wrapper
+		width 100%
+
+
+@media (max-width: 800px)
+	h1
+		font-size 1em
+	#wrapper
+		padding: 0.1em 0
+		width 100%
+
+
+

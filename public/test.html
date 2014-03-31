@@ -1,0 +1,201 @@
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <div id="show"></div>
+
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+        <script src="components/mousetrap/mousetrap.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+        var keymap = {
+        _32: function (event) {
+          event.preventDefault()
+          console.log('space')
+          socket.emit('update', 'space')
+        },
+        _38: function (event) {
+          event.preventDefault()
+          console.log('up')
+          socket.emit('update', 'up')
+        },
+        _40: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'down')
+        },
+        _39: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'right')
+        },
+        _37: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'left')
+        },
+        space: function (event) {
+          event.preventDefault()
+          socket.emit('update', 'space')
+        }
+      }
+
+          var _types = [
+        [
+          [0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 1, 1, 1, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 0],
+          [0, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 1, 1, 0, 0],
+          [0, 0, 1, 1, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 1, 1, 0, 0],
+          [0, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0],
+          [0, 0, 0, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0]
+        ], [
+          [0, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 0, 0],
+          [0, 0, 1, 1, 0],
+          [0, 0, 0, 0, 0]
+      ]
+    ]
+function newMatrix(n, m) {
+
+  var matrix = [],
+    y
+
+  for (y = 0; y < n; y++) {
+    matrix.push([]);
+    for (x = 0; x < m; x++) {
+      matrix[y].push(undefined)
+    }
+  }
+
+  return matrix
+}
+    
+    function rotateMatrix(matrix, n) {
+
+      var rotMatrix,
+        _n, y ,x
+
+      for (_n = 0; _n < n; _n++) {
+        rotMatrix = newMatrix(matrix.length, matrix[0].length)
+        for (y = 0; y < matrix.length; y++) {
+          for (x = 0; x < matrix[0].length; x++) {
+            rotMatrix[x][matrix[0].length - 1 - y] = matrix[y][x]
+          }
+        }
+        matrix = rotMatrix
+      }
+
+      return matrix
+    }
+          var socket = io.connect('http://localhost');
+          var field = [];
+          socket.on('base', function (data) {
+            console.time('render')
+               var field = [];
+               for (var y = 0; y < data.field.length; y++) {
+                    field.push([]);
+                   for (var x = 0; x < data.field[y].length; x++) {
+                       if (data.field[y][x]){
+                        field[y].push(1);
+                    } else {
+                        field[y].push(0);
+                    }
+                   };
+               };
+               for (var i = 0; i < data.players.length; i++) {
+                player = data.players[i]
+                 var x = player.position[0],
+                      y = player.position[1],
+                     matrix = rotateMatrix(_types[player.type],player.rotation)
+                 for (var dy = 0; dy < matrix.length; dy++){
+                   for (var dx = 0; dx < matrix[0].length; dx++){
+                     if (matrix[dy][dx]){
+                      field[dx+x][dy+y] = 1
+                     }
+                  }
+                }
+               };
+
+               $('#show').empty();
+               for (var y = 0; y < field.length; y++) {
+                    $('#show').append("<br>");
+                    for (var i = 0; i < field[y].length; i++) {
+                      if (field[i][y]==1){
+                        $('#show').append('<span style="color:#0f0">X</span>');
+                      } else {
+                        $('#show').append('<span style="color:#ddd">O</span>');
+                      }
+                      
+                    };
+                    $('#show').append("    "+y);
+               }
+
+               $('#show').append("<br>pos: "+ data.players[0].position);
+               console.timeEnd('render')
+          });
+          // socket.emit('update', { my: 'data' });
+
+          $(document).keydown(function(e){
+            if ((e.keyCode < 41 && e.keyCode > 36) || e.keyCode == 32) { 
+               keymap['_'+e.keyCode](e);
+            }
+        });
+        </script>
+    </body>
+</html>
+
+<!-- data example
+
+  {
+    players: [
+            {name:"dustin",
+            position: [0,0],
+            rotation: 90,
+            type: 1,
+            id: 800}
+
+                ],
+    field: [
+            [{type:1,owner:1,id:1},...],
+            [{type:1,owner:1,id:1},...],
+            ...
+            [undefinded],
+            ...
+            ]
+
+} -->

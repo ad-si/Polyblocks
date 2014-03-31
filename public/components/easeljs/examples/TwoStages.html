@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>EaselJS Example: Two Stages passing mouse events</title>
+
+	<link href="assets/demoStyles.css" rel="stylesheet" type="text/css" />
+
+	<style>
+		.canvasHolder {
+			position: relative;
+			width: 960px;
+			height: 400px;
+		}
+		#canvasOne {
+			position: absolute;
+			right: 0;
+			top: 0;
+			border: 1px solid grey;
+		}
+		#canvasTwo {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			border: 1px solid grey;
+		}
+	</style>
+
+</head>
+
+<body onload="init();">
+
+	<header id="header" class="EaselJS">
+	    <h1><span class="text-product">Easel<strong>JS</strong></span> Two Stages passing mouse events</h1>
+	    <p>This example demonstrates using the nextStage property of Stage to pass mouse events between stages.</p>
+	</header>
+
+	<div class="canvasHolder">
+		<canvas id="canvasOne" width="540" height="260"></canvas>
+		<canvas id="canvasTwo" width="540" height="260"></canvas>
+	</div>
+
+	<!-- Note: All core EaselJS classes are listed here: -->
+	<script type="text/javascript" src="../src/createjs/events/Event.js"></script>
+	<script type="text/javascript" src="../src/createjs/events/EventDispatcher.js"></script>
+	<script type="text/javascript" src="../src/createjs/utils/IndexOf.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/UID.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/Ticker.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Matrix2D.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Point.js"></script>
+	<script type="text/javascript" src="../src/easeljs/geom/Rectangle.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shadow.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/SpriteSheet.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Graphics.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DisplayObject.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Container.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Stage.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Bitmap.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Sprite.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/BitmapAnimation.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/BitmapText.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Shape.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/Text.js"></script>
+	<script type="text/javascript" src="../src/easeljs/display/DOMElement.js"></script>
+	<script type="text/javascript" src="../src/easeljs/events/MouseEvent.js"></script>
+	<script type="text/javascript" src="../src/easeljs/filters/Filter.js"></script>
+	<script type="text/javascript" src="../src/easeljs/ui/ButtonHelper.js"></script>
+	<script type="text/javascript" src="../src/easeljs/ui/Touch.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetUtils.js"></script>
+	<script type="text/javascript" src="../src/easeljs/utils/SpriteSheetBuilder.js"></script>
+
+	<!-- We also provide hosted minified versions of all CreateJS libraries.
+	  http://code.createjs.com -->
+
+	<script>
+		var bottomStage, topStage;
+
+		function init() {
+			bottomStage = stageSetup("canvasOne", handleEvt);
+			bottomStage.name = "bottomStage";
+			//bottomStage.enableDOMEvents(false);	// you can set this if the bottom stage is completely covered by the top stage, to reduce the number of active event listeners.
+
+			topStage = stageSetup("canvasTwo", handleEvt);
+			topStage.name = "topStage";
+			topStage.enableMouseOver();
+			topStage.nextStage = bottomStage;
+			bottomStage.enableMouseOver();
+
+			bottomStage.addChild(makeSquare(30, 95, "red", handleEvt));
+			topStage.addChild(makeSquare(375, 30, "#0F0", handleEvt));
+
+			// text object to output the
+			bottomStage.text = bottomStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:195, y:30, lineHeight:16.7});
+			topStage.text = topStage.addChild(new createjs.Text("", "15px monospace", "#FFF")).set({x:30, y:30, lineHeight:16.7});
+		}
+
+		/* create a stage object to work with the canvas
+			add event listeners for stage events
+			start tick on stage
+		 */
+		function stageSetup(canvasName, handler) {
+			stage = new createjs.Stage(canvasName);
+			//stage.addEventListener("stagemousemove", handler);	// too noisy
+			stage.addEventListener("stagemousedown", handler);
+			stage.addEventListener("stagemouseup", handler);
+			stage.addEventListener("mouseleave", handler);
+			stage.addEventListener("mouseenter", handler);
+			
+			createjs.Ticker.addEventListener("tick", stage);
+			stage.log = [];
+
+			return stage;
+		}
+
+		/* create a container with a shape that reports mouse events to handler */
+		function makeSquare(x, y, color, handler) {
+			var container = new createjs.Container().set({name:"container"});
+
+			var shape = container.addChild(new createjs.Shape()).set({name:"square", x:x, y:y});
+			shape.graphics.beginFill(color).drawRect(0,0,135,135);
+
+			container.addEventListener("mouseover", handler);
+			container.addEventListener("mouseout", handler);
+			container.addEventListener("dblclick", handler);
+			container.addEventListener("click", handler);
+
+			container.cursor = "pointer";
+			return container;
+		}
+
+		// log functions that update text object on related stages with mouse event info
+		function handleEvt(evt) {
+			var target = evt.target, stage = target.getStage(), log = stage.log;
+			
+			log.push(evt.type+" on "+target.name+" x:"+evt.stageX+" y:"+evt.stageY);
+			while (log.length > 12) { log.shift(); }
+			
+			stage.text.text = log.join("\n");
+			
+			if (evt.type == "mouseover") { target.alpha = 0.5; }
+			if (evt.type == "mouseout") { target.alpha = 1; }
+		}
+	</script>
+
+</body>
+</html>

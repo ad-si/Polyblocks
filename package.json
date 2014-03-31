@@ -6,9 +6,11 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.4.8",
+    "express": "~3.4.8",
     "async": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "colors": "0.6.*",
+    "nib": "^1.0.2"
   },
   "description": "Polyblocks ==========",
   "main": "app.js",
