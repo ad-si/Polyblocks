@@ -5,7 +5,7 @@ var express = require('express'),
 	polyblocks = require('./routes/polyblocks'),
 	stylus = require('stylus'),
 	nib = require('nib'),
-	
+
 	app = express(),
 	server = http.createServer(app),
 	io = socketio.listen(server, {log: false}),
@@ -32,6 +32,9 @@ app.use(stylus.middleware({
 	src: __dirname + '/public',
 	compile: compile
 }))
+
+app.all('/reset', polyblocks.reset)
+
 app.use(express.static(path.join(__dirname, 'public')))
 
 if (devMode) app.use(express.errorHandler())

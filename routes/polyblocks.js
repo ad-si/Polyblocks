@@ -70,6 +70,11 @@ if (typeof module === "object" && module && typeof module.exports === "object"){
 		_sockets = sockets
 		_sockets.on('connection', newPlayer)
 	}
+	
+	exports.reset = function(req, res){
+		res.end()
+		startGame()
+	}
 }
 
 function randomInt (low, high) {
@@ -118,7 +123,9 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-	if (_player.length===0){
+	if (_gameover){
+		return
+	} else if (_player.length===0){
 		startGame()
 	} else {
 		extendField()
