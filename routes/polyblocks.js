@@ -89,6 +89,7 @@ function gameover(){
 	console.log('Game Over'.red.bold)
 	stopGame()
 	_sockets.emit('gameover', {players: _player, field: _field, score:_clearedLines})
+	startGame()
 }
 
 function startGame(){
@@ -127,9 +128,7 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-	if (_gameover){
-		return
-	} else if (_player.length===0){
+	if (_player.length===0){
 		startGame()
 	} else {
 		extendField()
