@@ -266,7 +266,7 @@ function extendField(){
 		}	
 	}
 	_field = nMatrix
-	_WIDTH++
+	_WIDTH+=_extendBy
 }
 
 function reduceField(){
@@ -282,7 +282,7 @@ function reduceField(){
 			_player[i].position[0]-=5;
 		}
 	}
-	_WIDTH--
+	_WIDTH-=_extendBy
 	_field = nMatrix
 
 }
