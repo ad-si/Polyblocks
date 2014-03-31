@@ -70,6 +70,11 @@ if (typeof module === "object" && module && typeof module.exports === "object"){
 		_sockets = sockets
 		_sockets.on('connection', newPlayer)
 	}
+	
+	exports.reset = function(req, res){
+		res.end()
+		startGame()
+	}
 }
 
 function randomInt (low, high) {
@@ -118,7 +123,9 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-	if (_player.length===0){
+	if (_gameover){
+		return
+	} else if (_player.length===0){
 		startGame()
 	} else {
 		extendField()
@@ -263,7 +270,12 @@ function reduceField(){
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
 		}	
-	}	
+	}
+	for (var i = 0; i < _player.length; i++){
+		if (_player[i].position[0] + 5 >= _WIDTH - 1){
+			_player[i].position[0]-=5;
+		}
+	}
 	_WIDTH--
 	_field = nMatrix
 

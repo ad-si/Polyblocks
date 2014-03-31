@@ -22,6 +22,7 @@ function compile(str, path) {
 // all environments
 app.set('port', process.env.PORT || 8000)
 app.use(express.favicon())
+app.use(express.compress())
 // app.use(express.logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded())
@@ -31,6 +32,9 @@ app.use(stylus.middleware({
 	src: __dirname + '/public',
 	compile: compile
 }))
+
+app.all('/reset', polyblocks.reset)
+
 app.use(express.static(path.join(__dirname, 'public')))
 
 if (devMode) app.use(express.errorHandler())
