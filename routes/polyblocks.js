@@ -263,7 +263,12 @@ function reduceField(){
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
 		}	
-	}	
+	}
+	for (var i = 0; i < _player.length; i++){
+		if (_player[i].position[0] + 5 >= _WIDTH - 1){
+			_player[i].position[0]-=5;
+		}
+	}
 	_WIDTH--
 	_field = nMatrix
 
