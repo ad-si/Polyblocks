@@ -2,10 +2,11 @@ var shared = require('../public/js/shared.js')
 var colors = require('colors')
 
 var _sockets = null,
-	_WIDTH = 40,
-	_HEIGHT = 30,
-	_start_width = 15,
+	_WIDTH = 0,
+	_HEIGHT = 0,
+	_start_width = 20,
 	_start_height = 30,
+	_extendBy = 4,
 	_minSpeed = 500,
 	_maxSpeed = 50,
 	_field,
@@ -89,6 +90,7 @@ function gameover(){
 	console.log('Game Over'.red.bold)
 	stopGame()
 	_sockets.emit('gameover', {players: _player, field: _field, score:_clearedLines})
+	startGame()
 }
 
 function startGame(){
@@ -127,9 +129,7 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-	if (_gameover){
-		return
-	} else if (_player.length===0){
+	if (_player.length===0){
 		startGame()
 	} else {
 		extendField()
@@ -201,7 +201,7 @@ function movePiecesDown() {
 
 function clearFinishedLines(player){
 	y = _HEIGHT-1
-	while (y >= 0) {
+	while (y > 0) {
 		cleared = true
 		for (x = 0; x <_WIDTH; x++) {
 			if (!_field[x][y]){
@@ -231,7 +231,9 @@ function placePiece(player){
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
 			if (matrix[dy][dx]){
-				_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid}
+				if (dx+x < _WIDTH && dy+y < _HEIGHT){
+					_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid}
+				}
 			}
 		}
 	}
@@ -257,30 +259,30 @@ function isColliding(player){
 }
 
 function extendField(){
-	nMatrix = shared.newMatrix(_WIDTH+1, _HEIGHT)
+	nMatrix = shared.newMatrix(_WIDTH+_extendBy, _HEIGHT)
 	for (var x = 0; x < _WIDTH; x++) {
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
 		}	
 	}
 	_field = nMatrix
-	_WIDTH++
+	_WIDTH+=_extendBy
 }
 
 function reduceField(){
 	
-	nMatrix = shared.newMatrix(_WIDTH-1, _HEIGHT)
-	for (var x = 0; x < _WIDTH-1; x++) {
+	nMatrix = shared.newMatrix(_WIDTH-_extendBy, _HEIGHT)
+	for (var x = 0; x < _WIDTH-_extendBy; x++) {
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
 		}	
 	}
 	for (var i = 0; i < _player.length; i++){
-		if (_player[i].position[0] + 5 >= _WIDTH - 1){
+		if (_player[i].position[0] + 5 >= _WIDTH - _extendBy){
 			_player[i].position[0]-=5;
 		}
 	}
-	_WIDTH--
+	_WIDTH-=_extendBy
 	_field = nMatrix
 
 }
