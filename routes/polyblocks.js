@@ -2,10 +2,11 @@ var shared = require('../public/js/shared.js')
 var colors = require('colors')
 
 var _sockets = null,
-	_WIDTH = 40,
-	_HEIGHT = 30,
-	_start_width = 15,
+	_WIDTH = 0,
+	_HEIGHT = 0,
+	_start_width = 20,
 	_start_height = 30,
+	_extendBy = 4,
 	_minSpeed = 500,
 	_maxSpeed = 50,
 	_field,
@@ -268,14 +269,14 @@ function extendField(){
 
 function reduceField(){
 	
-	nMatrix = shared.newMatrix(_WIDTH-1, _HEIGHT)
-	for (var x = 0; x < _WIDTH-1; x++) {
+	nMatrix = shared.newMatrix(_WIDTH-_extendBy, _HEIGHT)
+	for (var x = 0; x < _WIDTH-_extendBy; x++) {
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
 		}	
 	}
 	for (var i = 0; i < _player.length; i++){
-		if (_player[i].position[0] + 5 >= _WIDTH - 1){
+		if (_player[i].position[0] + 5 >= _WIDTH - _extendBy){
 			_player[i].position[0]-=5;
 		}
 	}
