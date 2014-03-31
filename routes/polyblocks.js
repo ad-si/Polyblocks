@@ -231,7 +231,9 @@ function placePiece(player){
 	for (var dy = 0; dy < matrix.length; dy++){
 		for (var dx = 0; dx < matrix[0].length; dx++){
 			if (matrix[dy][dx]){
-				_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid}
+				if (dx+x < _WIDTH && dy+y < _HEIGHT){
+					_field[dx+x][dy+y] = {type: player.type, id: player.id, owner: player.pid}
+				}
 			}
 		}
 	}
