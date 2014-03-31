@@ -28,9 +28,11 @@ h1 {
   height: 400px;
   width: 400px;
   background-color: #c8c8c8;
+  margin: 0 auto;
 }
 .pixel {
   position: absolute;
+  display: block;
 }
 #canvas {
   background-color: #c8c8c8;

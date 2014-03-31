@@ -91,32 +91,25 @@
 						//(pixel.id * 123) % 50 + '%'
 					],
 					color = 'hsl(' + colorArray.join() + ')',
-					pixelElement = $('div.pixel')
+					$pixelElement = $('<div class="pixel"></div>')
 
-					pixelElement.css({
-						width: 1 / data.field.length,
-						height: 1 / data.field[0].length,
-						'background-color': color,
-						left: pixelSize * x,
-						top: pixelSize * y
-					})
+				$pixelElement.css({
+					width: 1 / data.field.length * 100  + '%',
+					height: 1 / data.field[0].length * 100  + '%',
+					left: (x / data.field.length) * 100 + '%',
+					top: (y / data.field[0].length) * 100 + '%',
+					'background-color': color
+				})
 
-				console.log(pixelElement[0])
 
-				$htmlCanvas
-					.append(pixelElement)
-				//.rect(pixelSize * x, pixelSize * y, pixelSize, pixelSize)
-
-				//stage.addChild(rect)
-				//stage.scaleX = 0.5
-				//stage.update()
+				$pixelElement.appendTo($htmlCanvas)
 			}
 
-			//$htmlCanvas.html('')
+			$htmlCanvas.html('')
 
 			if (firstCall === true) {
 				//canvas.setAttribute('width', String(pixelSize * data.field.length) + 'px')
-				$htmlCanvas.css({width: String(pixelSize * data.field.length) + 'px'})
+				$htmlCanvas.css({width: String(pixelSize * data.field.length + 1.5) + 'px'})
 				//canvas.setAttribute('height', String(pixelSize * data.field[0].length) + 'px')
 				$htmlCanvas.css({'height': String(pixelSize * data.field[0].length) + 'px'})
 				firstCall = false
