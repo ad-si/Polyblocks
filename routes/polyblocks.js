@@ -259,7 +259,7 @@ function isColliding(player){
 }
 
 function extendField(){
-	nMatrix = shared.newMatrix(_WIDTH+1, _HEIGHT)
+	nMatrix = shared.newMatrix(_WIDTH+_extendBy, _HEIGHT)
 	for (var x = 0; x < _WIDTH; x++) {
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
