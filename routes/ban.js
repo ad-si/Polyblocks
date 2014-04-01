@@ -1,4 +1,4 @@
-exports.bannedIPs = ['101.98.152.51','10.209.142.246','10.65.17.122'];
+exports.bannedIPs = [];
 
 
 exports.ban = function(req, res, next){
