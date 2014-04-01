@@ -1,12 +1,10 @@
-var bannedIPs = ['101.98.152.51','10.209.142.246']
+exports.bannedIPs = ['101.98.152.51','10.209.142.246','10.65.17.122'];
 
 
 exports.ban = function(req, res, next){
-    if (bannedIPs.indexOf(req.ip) > -1){
-        res.end('Fuck Off')
+    if (exports.bannedIPs.indexOf(req.ip) > -1){
+        res.end('Fuck Off');
     } else {
-        next()
+        next();
     }
-}
-
-
+};

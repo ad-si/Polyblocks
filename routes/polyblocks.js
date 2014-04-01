@@ -1,5 +1,6 @@
 var shared = require('../public/js/shared.js')
 var colors = require('colors')
+var ban = require('./ban.js')
 
 var _sockets = null,
 	_WIDTH = 0,
@@ -149,7 +150,7 @@ function gameloop() {
 
 function newPlayer(socket) {
 	console.log(socket.handshake.address.address)
-	if (socket.handshake.address.address == '10.209.142.246'){ return }
+	if (ban.bannedIPs.indexOf(socket.handshake.address.address) > -1){ return }
 	pid = _pid++
 	_player.push({
 		pid: pid,
