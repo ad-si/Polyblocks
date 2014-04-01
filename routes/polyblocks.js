@@ -19,7 +19,7 @@ var _sockets = null,
 	_timeout,
 	x,
 	i, y,
-	_gameover = false
+	_gameover = true
 
 	keymap = {
 		up: function (player) {
@@ -99,7 +99,13 @@ function gameover(){
 		score: _clearedLines
 	})
 
-	startGame()
+	setTimeout(startGame, _timeout)
+}
+
+function stopGame(){
+	console.log('Stopping the game'.red.underline)
+	_gameover = true
+	clearTimeout(_gameloop)
 }
 
 function startGame(){
@@ -107,7 +113,7 @@ function startGame(){
 	var i
 
 	clearTimeout(_gameloop)
-
+	if (!_gameover){return}
 	console.log('Starting the game'.green.underline)
 
 	_clearedLines = 0
@@ -120,18 +126,11 @@ function startGame(){
 		_player[i].score = 0
 		newPiece(_player[i])
 	}
-
 	gameloop()
-}
 
-function stopGame(){
-	console.log('Stopping the game'.red.underline)
-	_gameover = true
-	clearTimeout(_gameloop)
 }
 
 function gameloop() {
-
 	movePiecesDown()
 	sendBaseData()
 
@@ -149,13 +148,6 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-
-	if (_player.length === 0){
-		startGame()
-	} else {
-		extendField()
-	}
-
 	pid = _pid++
 
 	_player.push({
@@ -163,13 +155,16 @@ function newPlayer(socket) {
 		name: 'rnd',
 		score: 0
 	})
-
-	newPiece(_player[_player.length-1])
-
 	socket.on('update', recvUpdate)
 	socket.on('disconnect', recvDisconnect)
 	socket['pid'] = pid
 
+	if (_player.length === 1){
+		startGame()
+	} else {
+		extendField()
+	}
+	newPiece(_player[_player.length-1])
 	sendBaseData()
 
 	console.log(('Player ' + pid + ' joined the game').cyan)
