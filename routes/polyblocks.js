@@ -19,8 +19,7 @@ var _sockets = null,
 	_timeout,
 	x,
 	i, y,
-	_gameover = false
-
+	_gameover = false,
 	keymap = {
 		up: function (player) {
 			player.rotation = (player.rotation + 1) % 4
@@ -179,7 +178,7 @@ function newPiece(player) {
 
 	player.position = [randomInt(0, _WIDTH-3), 0]
 	player.rotation = 0
-	player.type = randomInt(0, 8),
+	player.type = randomInt(0, 8)
 	player.id = _blockId++
 
 	if (isColliding(player)){
@@ -206,7 +205,8 @@ function recvUpdate(data) {
 	sendBaseData()
 }
 
-function recvDisconnect(data) {
+function recvDisconnect() {
+
 	console.log(('Player '+this.pid+' leaved the game').grey)
 	indexToDelete = -1
 
@@ -215,11 +215,13 @@ function recvDisconnect(data) {
 			indexToDelete = i
 		}
 	}
+
 	_player.splice(indexToDelete, 1)
 
 	if (_player.length === 0){
 		stopGame()
-	} else {
+	}
+	else {
 		reduceField()
 		sendBaseData()
 	}
@@ -308,7 +310,9 @@ function isColliding(player){
 }
 
 function extendField(){
+
 	nMatrix = shared.newMatrix(_WIDTH + _extendBy, _HEIGHT)
+
 	for (var x = 0; x < _WIDTH; x++) {
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
@@ -321,17 +325,19 @@ function extendField(){
 function reduceField(){
 
 	nMatrix = shared.newMatrix(_WIDTH-_extendBy, _HEIGHT)
+
 	for (var x = 0; x < _WIDTH-_extendBy; x++) {
 		for (var y = 0; y < _HEIGHT; y++) {
 			nMatrix[x][y] = _field[x][y]
 		}
 	}
+
 	for (var i = 0; i < _player.length; i++){
 		if (_player[i].position[0] + 5 >= _WIDTH - _extendBy){
 			_player[i].position[0]-=5
 		}
 	}
+
 	_WIDTH-=_extendBy
 	_field = nMatrix
-
 }

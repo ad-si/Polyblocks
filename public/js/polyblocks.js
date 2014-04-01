@@ -73,33 +73,44 @@
 
 		function drawHtmlInc(x, y, pixel) {
 
-			var colorArray = [
+			/*var colorArray = [
 						(pixel.owner * 100) % 360,
 						60 + ((pixel.type * 123) % 40) + '%',
 						40 + ((pixel.type * 123) % 40) + '%'
 					//(pixel.id * 123) % 50 + '%'
-				],
-				color = 'hsl(' + colorArray.join() + ')',
-				$pixelElement = $('<div class="pixel"></div>')
+				],*/
+				//color = 'hsl(' + colorArray.join(',') + ')',
 
-			$pixelElement.css({
-				width: 1 / data.field.length * 100 + '%',
-				height: 1 / data.field[0].length * 100 + '%',
-				left: (x / data.field.length) * 100 + '%',
-				top: (y / data.field[0].length) * 100 + '%',
-				'background-color': color
-			})
+			var	pixelElement = document.createElement('div'),
+				style = {
+					width: 1 / data.field.length * 100 + '%',
+					height: 1 / data.field[0].length * 100 + '%',
+					left: (x / data.field.length) * 100 + '%',
+					top: (y / data.field[0].length) * 100 + '%'
+				},
+				styleString = JSON
+					.stringify(style, function (key, value) {
+						return (typeof value === 'string') ?
+							value.replace(/,/g, '$') :
+							value
+					})
+					.replace(/,/g, ';')
+					.replace(/\$/g, ',')
+					.replace(/"/g, '')
+					.replace(/^\{(.*)\}$/g, '$1')
 
+			pixelElement.className = 'pixel block-' + pixel.owner + '-' + pixel.type
+			pixelElement.setAttribute('style', styleString)
 
-			$pixelElement.appendTo($htmlCanvas)
+			containerElement.appendChild(pixelElement)
 		}
 
 
 		containerElement.innerHTML = ''
 
-		newPixelSize = maxWidth / data.field.length
+		newPixelSize = Math.round(maxWidth / data.field.length)
 
-		if(newPixelSize < pixelSize){
+		if (newPixelSize < pixelSize) {
 			pixelSize = newPixelSize
 			width = newPixelSize * data.field.length
 			height = newPixelSize * data.field[0].length
@@ -138,7 +149,7 @@
 			for (y = 0; y < data.field[0].length; y++)
 
 				if (data.field[x][y])
-					drawHTML(x, y, data.field[x][y])
+					drawHtmlInc(x, y, data.field[x][y])
 
 
 		/*data.field.forEach(function (column, x) {
@@ -218,7 +229,12 @@
 				swipeleft: modifications.moveLeft,
 				dragleft: modifications.moveLeft
 			},
-			key
+			latestX = null,
+			key,
+			hammerConfig = {
+				prevent_default: true,
+				swipe_velocity: 0.1
+			}
 
 
 		for (key in keymap)
@@ -226,9 +242,25 @@
 				Mousetrap.bind(key, keymap[key])
 
 
-		Hammer(document.body, {prevent_default: true})
-			.on('swipeup swipedown dragleft dragright tap', function (event) {
-				touchMap[event.type]()
+		Hammer(document.body, hammerConfig)
+			.on('dragstart', function (event) {
+				latestX = event.gesture.startEvent.center.pageX
+			})
+			.on('dragstart dragleft dragright swipedown swipeup tap', function (event) {
+
+				//console.log(event.type)
+
+				if (event.type === 'dragright' || event.type === 'dragleft') {
+					if (Math.abs(latestX - event.gesture.center.pageX) >= 15) {
+						touchMap[event.type]()
+						latestX = event.gesture.center.pageX
+					}
+				}
+				else {
+					console.log(event.type)
+					touchMap[event.type]()
+				}
+
 			})
 
 

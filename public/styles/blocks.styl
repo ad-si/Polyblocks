@@ -1,0 +1,8 @@
+blockColor(playerId, blockType)
+	hsl(playerId * 57 % 360, 40 + blockType * 5, 40 + blockType * 5)
+
+for playerId in (0..29)
+	for blockType in (0..7)
+		.block-{playerId}-{blockType}
+			//display auto
+			background-color blockColor(playerId, blockType)

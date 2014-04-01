@@ -9,7 +9,7 @@ var express = require('express'),
 	app = express(),
 	server = http.createServer(app),
 	io = socketio.listen(server, {log: false}),
-	devMode = true //app.get('env') == 'development'
+	devMode = (app.get('env') === 'development')
 
 function compile(str, path) {
 	return stylus(str)
