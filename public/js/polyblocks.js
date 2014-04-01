@@ -5,6 +5,7 @@
 
 	function render(data, containerElement) {
 
+		var styleElement;
 		var pixelSize = 14,
 			maxWidth = 600,
 			width,
@@ -73,31 +74,31 @@
 
 		function drawHtmlInc(x, y, pixel) {
 
-			/*var colorArray = [
-						(pixel.owner * 100) % 360,
-						60 + ((pixel.type * 123) % 40) + '%',
-						40 + ((pixel.type * 123) % 40) + '%'
-					//(pixel.id * 123) % 50 + '%'
-				],*/
-				//color = 'hsl(' + colorArray.join(',') + ')',
+			// Performance is worse than string-concatenation
+			/*
+			 var style = {
+			 width: (1 / data.field.length * 100).toFixed(1) + '%',
+			 height: (1 / data.field[0].length * 100).toFixed(1) + '%',
+			 left: ((x / data.field.length) * 100).toFixed(1) + '%',
+			 top: ((y / data.field[0].length) * 100).toFixed(1) + '%'
+			 },
+			 styleString = JSON
+			 .stringify(style, function (key, value) {
+			 return (typeof value === 'string') ?
+			 value.replace(/,/g, '$') :
+			 value
+			 })
+			 .replace(/,/g, ';')
+			 .replace(/\$/g, ',')
+			 .replace(/"/g, '')
+			 .replace(/^\{(.*)\}$/g, '$1')
+			 */
 
-			var	pixelElement = document.createElement('div'),
-				style = {
-					width: 1 / data.field.length * 100 + '%',
-					height: 1 / data.field[0].length * 100 + '%',
-					left: (x / data.field.length) * 100 + '%',
-					top: (y / data.field[0].length) * 100 + '%'
-				},
-				styleString = JSON
-					.stringify(style, function (key, value) {
-						return (typeof value === 'string') ?
-							value.replace(/,/g, '$') :
-							value
-					})
-					.replace(/,/g, ';')
-					.replace(/\$/g, ',')
-					.replace(/"/g, '')
-					.replace(/^\{(.*)\}$/g, '$1')
+			var pixelElement = document.createElement('div'),
+				styleString =
+					'left:' + ((x / data.field.length) * 100).toFixed(1) + '%;' +
+					'top:' + ((y / data.field[0].length) * 100).toFixed(1) + '%;'
+
 
 			pixelElement.className = 'pixel block-' + pixel.owner + '-' + pixel.type
 			pixelElement.setAttribute('style', styleString)
@@ -125,6 +126,18 @@
 				'height:' + height + 'px'
 		)
 
+		styleElement = document.createElement('style')
+
+		styleElement.textContent =
+			'.pixel {' +
+			'width:' + (1 / data.field.length * 100).toFixed(1) + '%;' +
+			'height:' + (1 / data.field[0].length * 100).toFixed(1) + '%;' +
+			//'width:' + pixelSize + 'px;' +
+			//'height:' + pixelSize + 'px;' +
+			'}'
+
+		containerElement.appendChild(styleElement)
+
 
 		data.players.forEach(function (player) {
 
@@ -148,8 +161,9 @@
 		for (x = 0; x < data.field.length; x++)
 			for (y = 0; y < data.field[0].length; y++)
 
-				if (data.field[x][y])
+				if (data.field[x][y]) {
 					drawHtmlInc(x, y, data.field[x][y])
+				}
 
 
 		/*data.field.forEach(function (column, x) {
@@ -265,8 +279,8 @@
 
 
 		socket.on('base', function (data) {
-			console.timeEnd('socket')
-			//console.time('render')
+			//console.timeEnd('socket')
+			console.time('render')
 			render(data, canvas)
 		})
 	}
