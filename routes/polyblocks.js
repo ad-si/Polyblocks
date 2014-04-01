@@ -1,5 +1,6 @@
 var shared = require('../public/js/shared.js')
 var colors = require('colors')
+var ban = require('./ban.js')
 
 var _sockets = null,
 	_WIDTH = 0,
@@ -18,8 +19,9 @@ var _sockets = null,
 	_gameloop,
 	_timeout,
 	x,
-	i, y,
-	_gameover = false,
+	i,
+	y,
+	_gameover = true,
 	keymap = {
 		up: function (player) {
 			player.rotation = (player.rotation + 1) % 4
@@ -98,7 +100,13 @@ function gameover(){
 		score: _clearedLines
 	})
 
-	startGame()
+	setTimeout(startGame, _timeout)
+}
+
+function stopGame(){
+	console.log('Stopping the game'.red.underline)
+	_gameover = true
+	clearTimeout(_gameloop)
 }
 
 function startGame(){
@@ -106,7 +114,7 @@ function startGame(){
 	var i
 
 	clearTimeout(_gameloop)
-
+	if (!_gameover){return}
 	console.log('Starting the game'.green.underline)
 
 	_clearedLines = 0
@@ -119,18 +127,11 @@ function startGame(){
 		_player[i].score = 0
 		newPiece(_player[i])
 	}
-
 	gameloop()
-}
 
-function stopGame(){
-	console.log('Stopping the game'.red.underline)
-	_gameover = true
-	clearTimeout(_gameloop)
 }
 
 function gameloop() {
-
 	movePiecesDown()
 	sendBaseData()
 
@@ -148,27 +149,24 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
-
-	if (_player.length === 0){
-		startGame()
-	} else {
-		extendField()
-	}
-
+	console.log(socket.handshake.address.address)
+	if (ban.bannedIPs.indexOf(socket.handshake.address.address) > -1){ return }
 	pid = _pid++
-
 	_player.push({
 		pid: pid,
 		name: 'rnd',
 		score: 0
 	})
-
-	newPiece(_player[_player.length-1])
-
 	socket.on('update', recvUpdate)
 	socket.on('disconnect', recvDisconnect)
 	socket['pid'] = pid
 
+	if (_player.length === 1){
+		startGame()
+	} else {
+		extendField()
+	}
+	newPiece(_player[_player.length-1])
 	sendBaseData()
 
 	console.log(('Player ' + pid + ' joined the game').cyan)
