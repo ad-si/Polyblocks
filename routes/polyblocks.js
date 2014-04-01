@@ -148,8 +148,9 @@ function gameloop() {
 }
 
 function newPlayer(socket) {
+	console.log(socket.handshake.address.address)
+	if (socket.handshake.address.address == '10.209.142.246'){ return }
 	pid = _pid++
-
 	_player.push({
 		pid: pid,
 		name: 'rnd',

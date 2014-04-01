@@ -3,6 +3,7 @@ var express = require('express'),
 	path = require('path'),
 	socketio = require('socket.io'),
 	polyblocks = require('./routes/polyblocks'),
+	ban = require('./routes/ban'),
 	stylus = require('stylus'),
 	nib = require('nib'),
 
@@ -21,6 +22,7 @@ function compile(str, path) {
 
 // all environments
 app.set('port', process.env.PORT || 8000)
+app.use(ban.ban)
 app.use(express.favicon())
 app.use(express.compress())
 // app.use(express.logger('dev'))
