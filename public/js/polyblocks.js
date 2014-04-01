@@ -1,7 +1,7 @@
 !function (window, document) {
 
 	var counter = 0,
-		scoreContainer = document.getElementById('score')
+		scoresContainer = document.getElementById('scores')
 
 	function render(data, containerElement) {
 
@@ -139,11 +139,15 @@
 		containerElement.appendChild(styleElement)
 
 
+		scoresContainer.innerHTML = '' //data.score
+
+
 		data.players.forEach(function (player) {
 
 			var x = player.position[0],
 				y = player.position[1],
 				matrix = shared.rotateMatrix(shared.types[player.type], player.rotation),
+				scoreSpan,
 				dx,
 				dy
 
@@ -155,6 +159,12 @@
 							owner: player.pid,
 							type: player.type
 						}
+
+			scoreSpan = document.createElement('span')
+			scoreSpan.textContent = player.score //player.name + ': ' + player.score
+			scoreSpan.className = 'block-' + player.pid + '-3'
+
+			scoresContainer.appendChild(scoreSpan)
 		})
 
 		// Better performance than forEach
@@ -176,8 +186,6 @@
 		 }
 		 })
 		 })*/
-
-		scoreContainer.innerHTML = data.score
 
 		console.timeEnd('render')
 	}
@@ -281,6 +289,7 @@
 		socket.on('base', function (data) {
 			//console.timeEnd('socket')
 			console.time('render')
+			console.log(data)
 			render(data, canvas)
 		})
 	}
