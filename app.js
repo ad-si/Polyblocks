@@ -1,16 +1,16 @@
-var express = require('express'),
-	http = require('http'),
-	path = require('path'),
-	socketio = require('socket.io'),
-	polyblocks = require('./routes/polyblocks'),
-	ban = require('./routes/ban'),
-	stylus = require('stylus'),
-	nib = require('nib'),
+const express = require('express')
+const	http = require('http')
+const	path = require('path')
+const	socketio = require('socket.io')
+const	polyblocks = require('./routes/polyblocks')
+const	ban = require('./routes/ban')
+const	stylus = require('stylus')
+const	nib = require('nib')
 
-	app = express(),
-	server = http.createServer(app),
-	io = socketio.listen(server, {log: false}),
-	devMode = (app.get('env') === 'development')
+const	app = express()
+const server = http.createServer(app)
+const	io = new socketio.Server(server)
+const	devMode = (app.get('env') === 'development')
 
 function compile(str, path) {
 	return stylus(str)
@@ -21,30 +21,21 @@ function compile(str, path) {
 }
 
 // all environments
-app.set('port', process.env.PORT || 8000)
+app.set('port', process.env.PORT || 9014)
 app.use(ban.ban)
-app.use(express.favicon())
-app.use(express.compress())
-// app.use(express.logger('dev'))
 app.use(express.json())
-app.use(express.urlencoded())
-app.use(express.methodOverride())
-app.use(app.router)
+app.use(express.urlencoded({ extended: true }))
 app.use(stylus.middleware({
 	src: __dirname + '/public',
 	compile: compile
 }))
-
 app.all('/reset', polyblocks.reset)
-
 app.use(express.static(path.join(__dirname, 'public')))
 
-if (devMode) app.use(express.errorHandler())
-
-
-polyblocks.init(io.sockets)
-
+polyblocks.init(io)
 
 server.listen(app.get('port'), function () {
-	console.log('Polyblocks server listening on port ' + app.get('port'))
+	console.log(
+		`Polyblocks server listening on http://localhost:${app.get('port')}`
+	)
 })
