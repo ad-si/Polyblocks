@@ -1,2 +1,3 @@
 .direnv
 /dist
+.claude/settings.local.json
