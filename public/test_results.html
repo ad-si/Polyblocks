@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Polyblocks Test Results</title>
+</head>
+
+<body>
+  <h1>Polyblocks Manual Test Results</h1>
+  <div id="results"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const results = document.getElementById('results');
+
+    function log(message, status = 'info') {
+      const div = document.createElement('div');
+      div.style.color = status === 'success' ? 'green' : status === 'error' ? 'red' : 'black';
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      results.appendChild(div);
+      console.log(message);
+    }
+
+    log('Starting Socket.IO connection test...');
+
+    try {
+      const socket = io('http://localhost:8000');
+
+      socket.on('connect', () => {
+        log('✓ Socket.IO connection successful', 'success');
+        log(`Connection ID: ${socket.id}`, 'success');
+
+        // Test sending an update
+        log('Testing game controls...');
+        socket.emit('update', 'space');
+      });
+
+      socket.on('base', (data) => {
+        log('✓ Received game state data', 'success');
+        log(`Players: ${data.players.length}`, 'success');
+        log(`Field size: ${data.field.length}x${data.field[0] ? data.field[0].length : 0}`, 'success');
+        log(`Score: ${data.score}`, 'success');
+
+        if (data.players.length > 0) {
+          const player = data.players[0];
+          log(`Player position: [${player.position[0]}, ${player.position[1]}]`, 'success');
+          log(`Player type: ${player.type}`, 'success');
+        }
+
+        log('✓ Game is running correctly!', 'success');
+      });
+
+      socket.on('gameover', (data) => {
+        log('✓ Game over event received', 'success');
+      });
+
+      socket.on('connect_error', (error) => {
+        log(`✗ Connection error: ${error.message}`, 'error');
+      });
+
+      socket.on('disconnect', (reason) => {
+        log(`Connection closed: ${reason}`);
+      });
+
+    } catch (error) {
+      log(`✗ JavaScript error: ${error.message}`, 'error');
+    }
+
+    // Test key events
+    document.addEventListener('keydown', (e) => {
+      if ((e.keyCode < 41 && e.keyCode > 36) || e.keyCode == 32) {
+        const keyNames = { 32: 'space', 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
+        log(`Key pressed: ${keyNames[e.keyCode] || e.keyCode}`);
+      }
+    });
+
+    log('Test page loaded. Try pressing arrow keys or space bar.');
+  </script>
+</body>
+
+</html>

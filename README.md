@@ -1,7 +1,9 @@
 # Polyblocks
 
-Multiplayer tetris game
+Multiplayer Tetris game
 
-Javascript style guide: https://github.com/style-guides/Javascript
 
-Branching model: http://nvie.com/posts/a-successful-git-branching-model
+## Related
+
+- [Jstris](https://jstris.jezevec10.com/)
+- [Tetr.io](https://tetr.io/)

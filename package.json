@@ -3,10 +3,6 @@
   "description": "Multiplayer Tetris game",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "start": "node app.js",
-    "test": "echo \"No tests configured. Run 'npm start' and open http://localhost:3000/test.html for manual testing.\""
-  },
   "dependencies": {
     "async": "*",
     "colors": "1.4.*",
@@ -17,9 +13,15 @@
     "nib": "^1.2.0",
     "socket.io": "*"
   },
-  "main": "app.js",
+  "main": "app.ts",
   "devDependencies": {
-    "stylus": "~0.64.0"
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.1",
+    "@types/socket.io": "^3.0.1",
+    "@types/stylus": "^0.48.43",
+    "stylus": "~0.64.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",
