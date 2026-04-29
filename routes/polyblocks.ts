@@ -1,4 +1,4 @@
-import shared, { Player, GameField, GamePiece } from '../public/js/shared';
+import shared, { GameField, Player } from '../src/shared';
 import 'colors';
 import * as ban from './ban';
 import { Request, Response } from 'express';

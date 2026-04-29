@@ -9,18 +9,24 @@ node_modules: package.json bun.lock
 
 .PHONY: build
 build: node_modules
-	bunx tsc
+	bun run vite build
 
 
 .PHONY: start
-start: node_modules
-	bun app.ts
+start: build
+	NODE_ENV=production bun app.ts
 
 
 .PHONY: dev
 dev: node_modules
-	bun --watch app.ts
+	NODE_ENV=development bun --watch app.ts
+
+
+.PHONY: typecheck
+typecheck: node_modules
+	bunx tsc -p tsconfig.json
+	bunx tsc -p tsconfig.client.json
 
 
 .PHONY: test
-test: build
+test: typecheck build

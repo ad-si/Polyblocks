@@ -1,21 +1,23 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "./dist",
     "rootDir": ".",
+    "lib": ["ES2020"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": true,
+    "noEmit": true,
     "typeRoots": ["./node_modules/@types", "./types"]
   },
   "include": [
-    "**/*.ts",
-    "**/*.js",
+    "app.ts",
+    "routes/**/*.ts",
+    "src/shared.ts",
     "types/**/*"
   ],
   "exclude": [

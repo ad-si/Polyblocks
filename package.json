@@ -3,25 +3,31 @@
   "description": "Multiplayer Tetris game",
   "version": "0.1.0",
   "private": true,
+  "main": "app.ts",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "NODE_ENV=development bun --watch app.ts",
+    "start": "NODE_ENV=production bun app.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.client.json"
+  },
   "dependencies": {
-    "async": "*",
     "colors": "1.4.*",
     "express": "~5.1.0",
     "hammerjs": "^2.0.8",
-    "jquery": "^3.7.1",
     "mousetrap": "^1.6.5",
-    "nib": "^1.2.0",
-    "socket.io": "*"
+    "socket.io": "*",
+    "socket.io-client": "^4.8.1"
   },
-  "main": "app.ts",
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/hammerjs": "^2.0.46",
+    "@types/mousetrap": "^1.6.15",
     "@types/node": "^24.5.1",
     "@types/socket.io": "^3.0.1",
-    "@types/stylus": "^0.48.43",
     "stylus": "~0.64.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^5.4.10"
   },
   "repository": {
     "type": "git",
